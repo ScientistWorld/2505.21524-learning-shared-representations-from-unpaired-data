@@ -17,4 +17,5 @@ set -e
 
 cd /home/user
 
-# TODO: run baseline
+OUTPUT_DIR="${1:-artifacts}"
+python -m baseline.handwritten_baselines --output-dir "$OUTPUT_DIR"

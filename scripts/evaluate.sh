@@ -26,5 +26,5 @@ cd /home/user
 
 mkdir -p scoring
 
-# TODO: implement evaluation using code in eval/
-# Must write scoring/scores.json at the end
+ARTIFACT_DIR="${1:-artifacts}"
+python -m eval.retrieval --artifact-dir "$ARTIFACT_DIR" --scores scoring/scores.json

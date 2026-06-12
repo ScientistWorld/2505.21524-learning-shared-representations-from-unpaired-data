@@ -15,7 +15,9 @@
 
 ## Progress Log
 
-<!-- Write your progress here -->
+### [2026-06-12 14:15] - none
+- Read the paper and appendix details for SUE.
+- Implemented the Handwritten reproduction pipeline and prepared the first validation job.
 
 ## Stop Justification
-- Completed at milestone `none`.
+- Not stopped; first job pending.

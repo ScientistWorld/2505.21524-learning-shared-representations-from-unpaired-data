@@ -10,5 +10,6 @@ set -e
 
 cd /home/user
 
-# TODO: run the paper's method
-# TODO: call scripts/evaluate.sh to score
+OUTPUT_DIR="${1:-artifacts}"
+python -m method.sue --output-dir "$OUTPUT_DIR"
+bash scripts/evaluate.sh "$OUTPUT_DIR"
