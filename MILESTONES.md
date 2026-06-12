@@ -1,6 +1,6 @@
 # Reproduction Milestones
 
-**Current: method_runs**
+**Current: core_claim**
 
 <!-- Milestone levels (update "Current" above as you progress):
   none             — just started, no meaningful progress yet
@@ -23,5 +23,9 @@
 - CPU job `07052327-9a9` executed the SUE Handwritten pipeline end to end and wrote retrieval artifacts.
 - The job failed validation only because debug baseline method names were not present in `reference.json`.
 
+### [2026-06-12 14:20] - core_claim
+- CPU job `1711044e-d35` completed successfully and passed `python validate.py --compare`.
+- Reproduced the core SUE weakly paired retrieval claim on the Handwritten benchmark: SUE mean R@10 69.50 versus contrastive baseline 54.25, both using 8-dimensional embeddings.
+
 ## Stop Justification
-- Not stopped; first job pending.
+- Stopping at `core_claim`: the reusable environment is packaged and validated for the paper's small Handwritten retrieval setting. Larger image-text settings remain for future expansion.
