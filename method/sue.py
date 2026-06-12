@@ -49,10 +49,15 @@ class NumericSpectralEmbedding:
         degree = np.maximum(degree, 1e-12)
         d_inv_sqrt = sparse.diags(1.0 / np.sqrt(degree))
         sym = d_inv_sqrt @ w @ d_inv_sqrt
-        evals, evecs = eigsh(sym, k=self.n_components + 1, which="LA")
+        v0 = np.linspace(1.0, 2.0, n, dtype=np.float64)
+        evals, evecs = eigsh(sym, k=self.n_components + 1, which="LA", v0=v0)
         order = np.argsort(evals)[::-1]
         evals = evals[order]
         evecs = evecs[:, order]
+        for col in range(evecs.shape[1]):
+            anchor = int(np.argmax(np.abs(evecs[:, col])))
+            if evecs[anchor, col] < 0:
+                evecs[:, col] *= -1.0
         self.eigenvalues = evals[1 : self.n_components + 1]
         self.eigenvectors = d_inv_sqrt @ evecs[:, 1 : self.n_components + 1]
         self._distances = distances
