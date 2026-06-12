@@ -13,7 +13,5 @@ set -e
 
 cd /home/user
 
-# Data must already be present before submission because compute nodes have no
-# internet. Run `bash scripts/download.sh` on the login node before submitting.
-bash scripts/reproduce.sh
+bash scripts/evaluate.sh artifacts
 python validate.py --compare

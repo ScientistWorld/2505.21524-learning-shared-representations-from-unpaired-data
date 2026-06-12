@@ -2,7 +2,7 @@
 
 ## Metrics
 
-The primary metric is cross-view Recall@10 on a held-out paired test set, averaged across both retrieval directions. For the Handwritten benchmark, `k2p` retrieves pixel-average features from Karhunen-Love coefficient queries, and `p2k` retrieves Karhunen-Love features from pixel-average queries. Recall@1 and Recall@5 are secondary benefit metrics. `embedding_dim` is tracked as a constraint metric so improvements do not come from simply using a much larger shared space.
+The primary metric is cross-view Recall@10 on a held-out paired test set, averaged across both retrieval directions. For the Handwritten benchmark, `k2p` retrieves pixel-average features from Karhunen-Love coefficient queries, and `p2k` retrieves Karhunen-Love features from pixel-average queries. Recall@1 and Recall@5 are secondary benefit metrics. The evaluator also reports class-level mean average precision, matching the paper's Appendix A.5 mAP table. `embedding_dim` is tracked as a constraint metric so improvements do not come from simply using a much larger shared space.
 
 ## Baselines and Targets
 
