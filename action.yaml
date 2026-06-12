@@ -1,8 +1,8 @@
 # IMPORTANT: Once you set action to 'submit' or 'done', STOP immediately.
 # Do NOT sleep, poll, or wait for jobs. The system reads this file
 # only after your turn ends. Sleeping blocks the entire pipeline.
-action: submit
+action: done
 gpus: 0
-test: true
+test: false
 milestone: core_claim
-notes: "CPU validation job to re-score existing Handwritten artifacts with added mAP metrics and run python validate.py --compare."
+notes: "Continuation audit restored the validated Recall@k core-claim reproduction; incompatible mAP extension was removed after job f7e6c609-927."

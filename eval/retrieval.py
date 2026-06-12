@@ -21,42 +21,24 @@ def recall_at(similarity: np.ndarray, ks: tuple[int, ...] = (1, 5, 10)) -> dict[
     return {f"r@{k}": float(np.mean(ranks <= k) * 100.0) for k in ks}
 
 
-def mean_average_precision(similarity: np.ndarray, query_labels: np.ndarray, gallery_labels: np.ndarray) -> float:
-    order = np.argsort(-similarity, axis=1)
-    ap_values = []
-    for i, ranked in enumerate(order):
-        relevant = gallery_labels[ranked] == query_labels[i]
-        if not np.any(relevant):
-            continue
-        precision_at_hits = np.cumsum(relevant) / (np.arange(len(relevant)) + 1)
-        ap_values.append(float(precision_at_hits[relevant].mean()))
-    return float(np.mean(ap_values) * 100.0)
-
-
 def evaluate_artifact(path: Path) -> tuple[str, str, dict[str, float]]:
     data = np.load(path, allow_pickle=False)
     method = str(data["method"])
     experiment = str(data["experiment"])
     x = normalize(data["x_embeddings"].astype(np.float64))
     y = normalize(data["y_embeddings"].astype(np.float64))
-    labels = data["labels"].astype(np.int64)
     xy_similarity = x @ y.T
     yx_similarity = y @ x.T
     x_to_y = recall_at(xy_similarity)
     y_to_x = recall_at(yx_similarity)
-    k2p_map = mean_average_precision(xy_similarity, labels, labels)
-    p2k_map = mean_average_precision(yx_similarity, labels, labels)
     metrics = {
         "k2p_r@1": x_to_y["r@1"],
         "k2p_r@5": x_to_y["r@5"],
         "k2p_r@10": x_to_y["r@10"],
-        "k2p_map": k2p_map,
         "p2k_r@1": y_to_x["r@1"],
         "p2k_r@5": y_to_x["r@5"],
         "p2k_r@10": y_to_x["r@10"],
-        "p2k_map": p2k_map,
         "mean_r@10": (x_to_y["r@10"] + y_to_x["r@10"]) / 2.0,
-        "mean_map": (k2p_map + p2k_map) / 2.0,
         "embedding_dim": float(x.shape[1]),
     }
     return experiment, method, metrics

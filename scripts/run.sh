@@ -13,5 +13,5 @@ set -e
 
 cd /home/user
 
-bash scripts/evaluate.sh artifacts
+bash scripts/reproduce.sh
 python validate.py --compare

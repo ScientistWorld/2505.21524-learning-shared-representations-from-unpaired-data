@@ -10,5 +10,9 @@
 - Validated artifact-based retrieval scoring with `python validate.py --compare`.
 - SUE achieved mean R@10 69.50 versus the reproduced paired-only contrastive baseline at 54.25 under the same 8-dimensional shared-space constraint.
 
+### [2026-06-12 14:35] - core_claim
+- Audited the continuation workspace and confirmed the implementation is SUE's actual spectral embedding, CCA, and MMD procedure rather than a surrogate.
+- CPU job `f7e6c609-927` passed structure validation, but an attempted mAP extension was removed because its values were not comparable to the paper's mAP table.
+
 ## Stop Justification
 - Completed at milestone `core_claim`.

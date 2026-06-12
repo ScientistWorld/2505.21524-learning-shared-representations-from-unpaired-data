@@ -7,7 +7,7 @@
 - Implemented artifact-based evaluation that does not import from `method/`.
 - Implemented a paired-only contrastive baseline to validate the scoring pipeline.
 - CPU job `1711044e-d35` ran the full reproduction script and passed `python validate.py --compare`.
-- Continuation audit confirmed the implementation is the paper's SUE computation rather than a surrogate. The evaluator is being extended to score the paper's class-level mAP metric from the same saved retrieval artifacts.
+- Continuation audit confirmed the implementation is the paper's SUE computation rather than a surrogate.
 
 ## Results
 
@@ -23,7 +23,6 @@ The reproduction is below the paper's reported SUE number but preserves the core
 
 ## Remaining
 
-- The mAP scoring extension needs a packaged-environment validation job before it can be counted as additional reproduced coverage.
 - Higher milestones beyond that would require adding more Table 1 datasets or paper ablations.
 - The current gym is usable for future agents to optimize the Handwritten weakly paired retrieval setting.
 
@@ -32,6 +31,7 @@ The reproduction is below the paper's reported SUE number but preserves the core
 - The paper's full image-text experiments require large image/text encoders and prepared embeddings. The first target is the paper's own small tabular Handwritten benchmark to establish the core weakly paired retrieval claim quickly.
 - Job `07052327-9a9` failed only because `scores.json` included debug method names not present in `reference.json`; the method itself ran successfully.
 - Job `1711044e-d35` fixed that issue and passed all validation checks.
+- Job `f7e6c609-927` validated a proposed class-level mAP extension, but the resulting mAP scale did not match the paper's Appendix A.5 values. The extension was removed to avoid scoring a metric with an incompatible definition.
 
 ## Deviations from Paper
 
