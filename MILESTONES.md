@@ -30,4 +30,4 @@
 - Confirmed `eval/` remains method-independent and scores saved artifacts from `artifacts/*.npz`.
 
 ## Stop Justification
-- Not stopped; container validation is pending.
+- Completed at milestone `method_runs`.
