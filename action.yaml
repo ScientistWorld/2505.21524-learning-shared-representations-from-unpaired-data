@@ -1,8 +1,8 @@
 # IMPORTANT: Once you set action to 'submit' or 'done', STOP immediately.
 # Do NOT sleep, poll, or wait for jobs. The system reads this file
 # only after your turn ends. Sleeping blocks the entire pipeline.
-action: done
+action: submit
 gpus: 0
-test: false
-milestone: core_claim
-notes: "Validated core-claim reproduction is complete: SUE beats the paired-only contrastive baseline on the paper's Handwritten weak-pair retrieval benchmark with artifact-based scoring."
+test: true
+milestone: method_runs
+notes: "CPU test job to verify the existing SUE Handwritten reproduction and standalone artifact evaluator inside the managed container after login-node Python lacked NumPy."

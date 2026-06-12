@@ -1,8 +1,14 @@
 # Reproduction Milestones
 
-**Current: core_claim**
+**Current: method_runs**
 
 ## Progress Log
+
+### [2026-06-12 14:34] - method_runs
+- Continued from a reset audit point.
+- Confirmed the implementation contains SUE's independent spectral embedding, weak-pair CCA, and unpaired MMD residual alignment steps.
+- Confirmed local validation structure passes, but standalone `scripts/evaluate.sh` cannot run on the login Python because NumPy is absent outside the managed container.
+- Submitting a CPU test job to verify the existing full reproduction and evaluator inside the reproducible container before restoring `core_claim`.
 
 ### [2026-06-12 14:19] - core_claim
 - Reproduced the paper's core weakly paired shared-representation claim on the UCI Multiple Features Handwritten benchmark.
@@ -19,4 +25,4 @@
 - Confirmed `eval/` remains method-independent and scores saved artifacts from `artifacts/*.npz`.
 
 ## Stop Justification
-- Completed at milestone `core_claim`.
+- Not stopped; container validation is pending.

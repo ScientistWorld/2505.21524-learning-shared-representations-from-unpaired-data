@@ -28,6 +28,7 @@ The reproduction is below the paper's reported SUE number but preserves the core
 
 ## Issues
 
+- Current continuation audit found that `bash scripts/evaluate.sh artifacts` does not run on the bare login-node Python because NumPy is absent there. The dependency is already declared in `environment/setup.sh`; a CPU test job is being submitted to verify the evaluator in the managed container.
 - The paper's full image-text experiments require large image/text encoders and prepared embeddings. The first target is the paper's own small tabular Handwritten benchmark to establish the core weakly paired retrieval claim quickly.
 - Job `07052327-9a9` failed only because `scores.json` included debug method names not present in `reference.json`; the method itself ran successfully.
 - Job `1711044e-d35` fixed that issue and passed all validation checks.
