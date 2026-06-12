@@ -28,4 +28,4 @@
 - Reproduced the core SUE weakly paired retrieval claim on the Handwritten benchmark: SUE mean R@10 69.50 versus contrastive baseline 54.25, both using 8-dimensional embeddings.
 
 ## Stop Justification
-- Stopping at `core_claim`: the reusable environment is packaged and validated for the paper's small Handwritten retrieval setting. Larger image-text settings remain for future expansion.
+- Completed at milestone `core_claim`.
