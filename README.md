@@ -152,4 +152,4 @@ Evaluation reads saved embedding artifacts from `artifacts/*.npz`, computes cosi
 **Current: method_runs**
 
 ## Stop Justification
-- Completed at milestone `method_runs`.
+- Completed at milestone `core_claim`.
