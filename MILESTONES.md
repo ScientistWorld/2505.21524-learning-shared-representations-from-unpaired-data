@@ -30,4 +30,4 @@
 - Confirmed `eval/` remains method-independent and scores saved artifacts from `artifacts/*.npz`.
 
 ## Stop Justification
-- Completed at milestone `core_claim`.
+- Completed at milestone `method_runs`.
