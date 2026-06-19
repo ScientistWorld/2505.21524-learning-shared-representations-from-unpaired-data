@@ -5,14 +5,56 @@
       "weight": 1.0,
       "primary_metric": "mean_r@10",
       "metrics": {
-        "k2p_r@1": {"higher_is_better": true, "coefficient": 0.5},
-        "k2p_r@5": {"higher_is_better": true, "coefficient": 0.5},
-        "k2p_r@10": {"higher_is_better": true, "coefficient": 1.0},
-        "p2k_r@1": {"higher_is_better": true, "coefficient": 0.5},
-        "p2k_r@5": {"higher_is_better": true, "coefficient": 0.5},
-        "p2k_r@10": {"higher_is_better": true, "coefficient": 1.0},
-        "mean_r@10": {"higher_is_better": true, "coefficient": 1.0},
-        "embedding_dim": {"higher_is_better": false, "coefficient": -0.1}
+        "k2p_r@1": {
+          "higher_is_better": true,
+          "coefficient": 0.5,
+          "description": "Exact keypoint-to-pixel nearest-neighbor retrieval catches methods that only place the true pair somewhere in the top ten."
+        },
+        "k2p_r@5": {
+          "higher_is_better": true,
+          "coefficient": 0.5,
+          "description": "Keypoint-to-pixel recall at five measures tighter retrieval quality than the headline top-ten metric."
+        },
+        "k2p_r@10": {
+          "higher_is_better": true,
+          "coefficient": 1.0,
+          "description": "Keypoint-to-pixel recall at ten follows the paper's retrieval-style benefit metric."
+        },
+        "p2k_r@1": {
+          "higher_is_better": true,
+          "coefficient": 0.5,
+          "description": "Exact pixel-to-keypoint nearest-neighbor retrieval checks that the shared representation works in the reverse direction."
+        },
+        "p2k_r@5": {
+          "higher_is_better": true,
+          "coefficient": 0.5,
+          "description": "Pixel-to-keypoint recall at five measures reverse-direction retrieval before the broader top-ten cutoff."
+        },
+        "p2k_r@10": {
+          "higher_is_better": true,
+          "coefficient": 1.0,
+          "description": "Pixel-to-keypoint recall at ten prevents one-direction-only improvements from dominating the score."
+        },
+        "mean_r@10": {
+          "higher_is_better": true,
+          "coefficient": 1.0,
+          "description": "Average bidirectional recall at ten is the primary cross-view retrieval benefit metric."
+        },
+        "mean_mrr": {
+          "higher_is_better": true,
+          "coefficient": 0.8,
+          "description": "Average bidirectional reciprocal rank rewards placing the true pair near the top instead of merely inside the recall window."
+        },
+        "mean_median_rank": {
+          "higher_is_better": false,
+          "coefficient": -0.3,
+          "description": "Average bidirectional median true-pair rank penalizes methods with poor typical ranking despite acceptable recall cutoffs."
+        },
+        "embedding_dim": {
+          "higher_is_better": false,
+          "coefficient": -0.1,
+          "description": "Latent dimensionality is a compactness constraint so recall cannot be improved solely by expanding the representation."
+        }
       },
       "results": {
         "contrastive": {

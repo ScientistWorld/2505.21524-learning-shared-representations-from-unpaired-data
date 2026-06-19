@@ -32,14 +32,17 @@ def stratified_slice_indices(labels: np.ndarray) -> np.ndarray:
     return np.sort(np.concatenate(selected))
 
 
-def recall_at(similarity: np.ndarray, ks: tuple[int, ...] = (1, 5, 10)) -> dict[str, float]:
+def retrieval_rank_metrics(similarity: np.ndarray, ks: tuple[int, ...] = (1, 5, 10)) -> dict[str, float]:
     n = similarity.shape[0]
     order = np.argsort(-similarity, axis=1)
     ranks = np.empty(n, dtype=np.int64)
     target = np.arange(n)
     for i in range(n):
         ranks[i] = int(np.where(order[i] == target[i])[0][0]) + 1
-    return {f"r@{k}": float(np.mean(ranks <= min(k, n)) * 100.0) for k in ks}
+    metrics = {f"r@{k}": float(np.mean(ranks <= min(k, n)) * 100.0) for k in ks}
+    metrics["mrr"] = float(np.mean(1.0 / ranks) * 100.0)
+    metrics["median_rank"] = float(np.median(ranks))
+    return metrics
 
 
 def require_array(data: np.lib.npyio.NpzFile, key: str, path: Path) -> np.ndarray:
@@ -68,8 +71,8 @@ def evaluate_artifact(path: Path) -> tuple[str, str, dict[str, float]]:
     y = normalize(y[indices])
     xy_similarity = x @ y.T
     yx_similarity = y @ x.T
-    x_to_y = recall_at(xy_similarity)
-    y_to_x = recall_at(yx_similarity)
+    x_to_y = retrieval_rank_metrics(xy_similarity)
+    y_to_x = retrieval_rank_metrics(yx_similarity)
     metrics = {
         "k2p_r@1": x_to_y["r@1"],
         "k2p_r@5": x_to_y["r@5"],
@@ -78,6 +81,8 @@ def evaluate_artifact(path: Path) -> tuple[str, str, dict[str, float]]:
         "p2k_r@5": y_to_x["r@5"],
         "p2k_r@10": y_to_x["r@10"],
         "mean_r@10": (x_to_y["r@10"] + y_to_x["r@10"]) / 2.0,
+        "mean_mrr": (x_to_y["mrr"] + y_to_x["mrr"]) / 2.0,
+        "mean_median_rank": (x_to_y["median_rank"] + y_to_x["median_rank"]) / 2.0,
         "embedding_dim": float(x.shape[1]),
     }
     return experiment, method, metrics
@@ -94,7 +99,7 @@ def main() -> None:
     if not artifacts:
         raise FileNotFoundError(f"No .npz artifacts found in {artifact_dir}")
 
-    scores: dict[str, dict[str, dict[str, dict[str, float]]]] = {"experiments": {}}
+    scores: dict[str, object] = {"_slice": SLICE_NAME, "experiments": {}}
     seen: set[tuple[str, str]] = set()
     for artifact in artifacts:
         experiment, method, metrics = evaluate_artifact(artifact)
@@ -102,14 +107,16 @@ def main() -> None:
         if key in seen:
             raise ValueError(f"Duplicate artifact for experiment={experiment!r}, method={method!r}")
         seen.add(key)
-        scores["experiments"].setdefault(experiment, {"results": {}})
-        scores["experiments"][experiment]["results"][method] = metrics
+        experiments = scores["experiments"]
+        assert isinstance(experiments, dict)
+        experiments.setdefault(experiment, {"results": {}})
+        experiments[experiment]["results"][method] = metrics
 
     out = Path(args.scores)
     out.parent.mkdir(parents=True, exist_ok=True)
     with out.open("w") as f:
         json.dump(scores, f, indent=2, sort_keys=True)
-    print(json.dumps({"slice": SLICE_NAME, **scores}, indent=2, sort_keys=True))
+    print(json.dumps(scores, indent=2, sort_keys=True))
 
 
 if __name__ == "__main__":
