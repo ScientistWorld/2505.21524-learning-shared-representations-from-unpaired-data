@@ -68,6 +68,7 @@ docker_*.tar.xz
 trajectory/
 .empty_*/
 outputs/
+artifacts/
 logs/
 .venv/
 venv/

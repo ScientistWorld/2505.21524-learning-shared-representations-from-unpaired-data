@@ -4,6 +4,12 @@
 
 ## Progress Log
 
+### [2026-06-19 17:45] - core_claim
+- Audited final packaging after a continuation handoff.
+- Fixed `scripts/run.sh` so submitted jobs regenerate baseline and SUE artifacts before scoring, instead of relying on stale ignored `.npz` files.
+- Documented all evaluator metrics in `scoring/TARGETS.md` and removed generated artifact metadata from git tracking.
+- Submitting a CPU test job to refresh `scoring/scores.json` and rerun validation inside the managed container.
+
 ### [2026-06-19 17:17] - core_claim
 - Continued from the reset-to-`method_runs` audit point and rechecked the implementation, evaluator, scripts, scoring files, and documentation.
 - Confirmed the checked-in method still implements SUE's graph spectral embeddings, 100-pair CCA alignment, and unpaired MMD residual alignment rather than a surrogate.

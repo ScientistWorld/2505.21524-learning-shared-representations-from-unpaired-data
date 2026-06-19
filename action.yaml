@@ -1,5 +1,5 @@
-action: done
+action: submit
 gpus: 0
-test: false
+test: true
 milestone: core_claim
-notes: "Hardened download.sh UCI fetch; verified data path alignment, public URL, source searches, and validation."
+notes: "CPU test job to regenerate baseline/SUE artifacts via scripts/reproduce.sh, refresh scores.json with current evaluator metrics, run train/test slices, and validate."
