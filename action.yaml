@@ -3,4 +3,4 @@
 # only after your turn ends. Sleeping blocks the entire pipeline.
 action: done
 milestone: core_claim
-notes: "Core claim reproduced and validated in managed CPU job 1162da06-1a4: SUE mean R@10 69.125 vs contrastive 54.25, with artifact-based evaluation and structure checks passing."
+notes: "Continuation audit restored core_claim: local validate.py --compare passed, and managed CPU job 1162da06-1a4 previously verified the full artifact-based reproduction with SUE mean R@10 69.125 vs contrastive 54.25."

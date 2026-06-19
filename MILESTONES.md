@@ -4,6 +4,12 @@
 
 ## Progress Log
 
+### [2026-06-19 17:17] - core_claim
+- Continued from the reset-to-`method_runs` audit point and rechecked the implementation, evaluator, scripts, scoring files, and documentation.
+- Confirmed the checked-in method still implements SUE's graph spectral embeddings, 100-pair CCA alignment, and unpaired MMD residual alignment rather than a surrogate.
+- Re-ran `python validate.py --compare`; scoring and structure checks passed with SUE mean R@10 69.125 versus contrastive 54.25, so `core_claim` is restored.
+- A direct bare-login `scripts/evaluate.sh` call still requires the container dependencies from `environment/setup.sh`; managed CPU job `1162da06-1a4` already verified the same evaluator inside the reproducible environment.
+
 ### [2026-06-19 17:12] - core_claim
 - Audited the resumed workspace against the paper's SUE algorithm: independent spectral embeddings, few-pair CCA, and unpaired MMD residual alignment are implemented for the Handwritten benchmark.
 - Confirmed managed CPU job `1162da06-1a4` completed `bash scripts/run.sh` and `python validate.py --compare` with all checks passing.

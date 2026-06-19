@@ -10,6 +10,7 @@
 - CPU job `f193cea4-e7f` reran the full reproduction inside the managed container and passed `python validate.py --compare`.
 - CPU job `1162da06-1a4` reran the final deterministic artifact path inside the managed container and passed `python validate.py --compare`.
 - Continuation audit confirmed the implementation is the paper's SUE computation rather than a surrogate.
+- Continuation revalidation on 2026-06-19 passed `python validate.py --compare`, so the reset milestone is restored to `core_claim`.
 
 ## Results
 
@@ -27,6 +28,7 @@ Job `1162da06-1a4` produced the current checked-in `scoring/scores.json`: SUE me
 
 - Higher milestones beyond that would require adding more Table 1 datasets or paper ablations.
 - The current gym is usable for future agents to optimize the Handwritten weakly paired retrieval setting.
+- The continuation audit did not identify a code or scoring issue requiring changes before closing at `core_claim`; pushing higher would require adding additional Table 1 datasets or ablations.
 
 ## Issues
 
