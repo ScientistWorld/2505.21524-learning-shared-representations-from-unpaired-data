@@ -4,6 +4,11 @@
 
 ## Progress Log
 
+### [2026-06-19 17:56] - core_claim
+- Audited the existing `core_claim` workspace with two subagents: the implementation matches SUE's spectral embedding, few-pair CCA, and unpaired MMD pipeline, and evaluation remains artifact-based with `eval/` separated from `method/`.
+- Promoted supervision-budget accounting into the score contract by adding artifact and metric fields for paired training count, unpaired training count, and held-out evaluation pair count.
+- Submitting a CPU verification job to regenerate artifacts and refresh `scoring/scores.json`, `scores_train.json`, and `scores_test.json` with the new constraint metrics.
+
 ### [2026-06-19 17:55] - core_claim
 - Completed final verification of the `core_claim` workspace.
 - Refreshed `scoring/scores.json` to include all current evaluator metrics and re-ran `python validate.py --compare` successfully.

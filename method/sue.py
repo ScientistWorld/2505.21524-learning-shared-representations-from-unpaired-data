@@ -194,6 +194,12 @@ def run(args: argparse.Namespace) -> None:
         x_embeddings=zx_test.astype(np.float32),
         y_embeddings=zy_test_mmd.astype(np.float32),
         labels=split.test_labels.astype(np.int64),
+        paired_train_count=np.asarray(args.n_paired, dtype=np.float32),
+        unpaired_train_count=np.asarray(
+            min(len(split.unpaired_x_indices), len(split.unpaired_y_indices)),
+            dtype=np.float32,
+        ),
+        eval_pair_count=np.asarray(len(split.test_labels), dtype=np.float32),
     )
     torch.save({"mmd": mmd.state_dict(), "args": vars(args)}, output_dir / "sue_handwritten.pt")
     with (output_dir / "sue_handwritten_meta.json").open("w") as f:

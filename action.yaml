@@ -1,5 +1,5 @@
-action: done
+action: submit
 gpus: 0
-test: false
+test: true
 milestone: core_claim
-notes: "Final verification passed; compact Handwritten retrieval gym is ready at core_claim."
+notes: "Regenerate Handwritten SUE and contrastive artifacts with explicit supervision-budget metrics, refresh scores/train/test scores, and run validate.py --compare."

@@ -100,6 +100,9 @@ def evaluate_artifact(path: Path) -> tuple[str, str, dict[str, float]]:
         "mean_mrr": (x_to_y["mrr"] + y_to_x["mrr"]) / 2.0,
         "mean_median_rank": (x_to_y["median_rank"] + y_to_x["median_rank"]) / 2.0,
         "embedding_dim": float(x.shape[1]),
+        "paired_train_count": float(require_array(data, "paired_train_count", path)),
+        "unpaired_train_count": float(require_array(data, "unpaired_train_count", path)),
+        "eval_pair_count": float(require_array(data, "eval_pair_count", path)),
     }
     return experiment, method, metrics
 

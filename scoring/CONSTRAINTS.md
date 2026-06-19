@@ -10,7 +10,7 @@ Report retrieval from an 8-dimensional shared representation for the main score.
 
 ## Evaluation
 
-Do not train on held-out test pairs or reorder artifacts to make diagonal retrieval easier. The evaluator assumes row `i` in one artifact view corresponds to row `i` in the other only for the fixed held-out test set.
+Do not train on held-out test pairs or reorder artifacts to make diagonal retrieval easier. The evaluator assumes row `i` in one artifact view corresponds to row `i` in the other only for the fixed held-out test set. Artifact files must report `paired_train_count`, `unpaired_train_count`, and `eval_pair_count`; these fields are part of the score contract, not optional metadata.
 
 ## Compliance Checklist
 

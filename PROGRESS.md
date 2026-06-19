@@ -12,6 +12,7 @@
 - Continuation audit confirmed the implementation is the paper's SUE computation rather than a surrogate.
 - Continuation revalidation on 2026-06-19 passed `python validate.py --compare`, so the reset milestone is restored to `core_claim`.
 - Packaging audit on 2026-06-19 found that `scripts/run.sh` should regenerate artifacts rather than score stale local artifacts; the script now runs `scripts/reproduce.sh`, train/test evaluation, and validation in one CPU job.
+- Follow-up audit on 2026-06-19 confirmed separation and artifact-based scoring, then promoted `paired_train_count`, `unpaired_train_count`, and `eval_pair_count` into the artifact and scoring schema.
 
 ## Results
 
@@ -31,6 +32,7 @@ Job `1162da06-1a4` produced the current checked-in `scoring/scores.json`: SUE me
 - The current gym is usable for future agents to optimize the Handwritten weakly paired retrieval setting.
 - The continuation audit did not identify a code or scoring issue requiring changes before closing at `core_claim`; pushing higher would require adding additional Table 1 datasets or ablations.
 - Current pending CPU test job should refresh `scoring/scores.json` with all evaluator metrics from regenerated artifacts.
+- Current pending CPU test job should also refresh the supervision-budget metrics added to the scoring contract.
 
 ## Issues
 
@@ -42,6 +44,7 @@ Job `1162da06-1a4` produced the current checked-in `scoring/scores.json`: SUE me
 - Job `f7e6c609-927` validated a proposed class-level mAP extension, but the resulting mAP scale did not match the paper's Appendix A.5 values. The extension was removed to avoid scoring a metric with an incompatible definition.
 - The paper has an internal pair-count inconsistency: Table 1/Table 12 report 100 paired samples for Handwritten, while Appendix E.8 says CCA used 600 pairs for all datasets. This reproduction follows the table setting because it is the reported Handwritten benchmark being scored.
 - The paper reports 1900 unpaired Handwritten samples in Table 12, but Appendix E.7 also says 400 paired samples are held out for evaluation and the unpaired training pool is independently thinned by 10% in each modality. This implementation follows the Appendix E.7 split/preparation literally: with 400 held out and 100 training pairs, the MMD/spectral stages see 100 paired examples plus 1350 unpaired examples per modality after thinning.
+- The current checked-in `scoring/scores.json` predates the new budget-metric artifact fields; the next submitted CPU job is expected to regenerate it from fresh artifacts.
 
 ## Deviations from Paper
 

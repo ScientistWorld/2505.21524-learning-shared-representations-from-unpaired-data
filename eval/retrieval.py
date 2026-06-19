@@ -45,6 +45,9 @@ def evaluate_artifact(path: Path) -> tuple[str, str, dict[str, float]]:
         "mean_mrr": (x_to_y["mrr"] + y_to_x["mrr"]) / 2.0,
         "mean_median_rank": (x_to_y["median_rank"] + y_to_x["median_rank"]) / 2.0,
         "embedding_dim": float(x.shape[1]),
+        "paired_train_count": float(data["paired_train_count"]),
+        "unpaired_train_count": float(data["unpaired_train_count"]),
+        "eval_pair_count": float(data["eval_pair_count"]),
     }
     return experiment, method, metrics
 

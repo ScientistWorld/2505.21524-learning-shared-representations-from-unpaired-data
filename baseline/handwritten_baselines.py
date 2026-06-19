@@ -26,7 +26,15 @@ class ContrastiveMLP(torch.nn.Module):
         return torch.nn.functional.normalize(z, dim=1)
 
 
-def save_artifact(path: Path, method: str, x: np.ndarray, y: np.ndarray, labels: np.ndarray) -> None:
+def save_artifact(
+    path: Path,
+    method: str,
+    x: np.ndarray,
+    y: np.ndarray,
+    labels: np.ndarray,
+    paired_train_count: int,
+    unpaired_train_count: int,
+) -> None:
     np.savez_compressed(
         path,
         method=method,
@@ -34,6 +42,9 @@ def save_artifact(path: Path, method: str, x: np.ndarray, y: np.ndarray, labels:
         x_embeddings=x.astype(np.float32),
         y_embeddings=y.astype(np.float32),
         labels=labels.astype(np.int64),
+        paired_train_count=np.asarray(paired_train_count, dtype=np.float32),
+        unpaired_train_count=np.asarray(unpaired_train_count, dtype=np.float32),
+        eval_pair_count=np.asarray(len(labels), dtype=np.float32),
     )
 
 
@@ -81,7 +92,15 @@ def main() -> None:
     with torch.no_grad():
         x_test = x_model(torch.tensor(split.test_x, dtype=torch.float32).to(args.device)).cpu().numpy()
         y_test = y_model(torch.tensor(split.test_y, dtype=torch.float32).to(args.device)).cpu().numpy()
-    save_artifact(out_dir / "contrastive_handwritten.npz", "contrastive", x_test, y_test, split.test_labels)
+    save_artifact(
+        out_dir / "contrastive_handwritten.npz",
+        "contrastive",
+        x_test,
+        y_test,
+        split.test_labels,
+        paired_train_count=args.n_paired,
+        unpaired_train_count=0,
+    )
     print(f"Wrote contrastive baseline to {out_dir}")
 
 
