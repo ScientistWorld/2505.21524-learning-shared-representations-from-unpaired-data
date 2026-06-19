@@ -19,3 +19,4 @@ cd /home/user
 
 OUTPUT_DIR="${1:-artifacts}"
 python -m baseline.handwritten_baselines --output-dir "$OUTPUT_DIR"
+bash scripts/evaluate.sh "$OUTPUT_DIR"
