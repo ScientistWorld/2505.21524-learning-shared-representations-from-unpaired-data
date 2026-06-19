@@ -65,4 +65,3 @@
 
 ## Stop Justification
 - Completed at milestone `core_claim`.
-- Final verification found the gym ready for use after score-contract cleanup; expanding beyond this point would require reproducing additional paper datasets or ablations.
