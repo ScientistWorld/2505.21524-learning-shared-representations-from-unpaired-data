@@ -1,5 +1,5 @@
-action: submit
+action: done
 gpus: 0
 test: false
 milestone: core_claim
-notes: "Rerun split scoring after fixing train/test evaluators to split queries while ranking against the full artifact gallery."
+notes: "Full-gallery query split; 20 train metrics and 20 test metrics across SUE and contrastive; SUE mean_r@10 train/test 67.25/71.0, contrastive 55.0/53.5; no nulls, method sets match, validation passes."
