@@ -8,6 +8,7 @@
 - Implemented a paired-only contrastive baseline to validate the scoring pipeline.
 - CPU job `1711044e-d35` ran the full reproduction script and passed `python validate.py --compare`.
 - CPU job `f193cea4-e7f` reran the full reproduction inside the managed container and passed `python validate.py --compare`.
+- CPU job `1162da06-1a4` reran the final deterministic artifact path inside the managed container and passed `python validate.py --compare`.
 - Continuation audit confirmed the implementation is the paper's SUE computation rather than a surrogate.
 
 ## Results
@@ -20,7 +21,7 @@ Job `1711044e-d35` produced validated Handwritten retrieval scores:
 | SUE reproduction | 18.00 | 51.00 | 68.25 | 16.75 | 47.75 | 68.50 | 68.375 | 8 |
 | SUE paper reference | 25.50 | 62.00 | 79.00 | 25.00 | 61.75 | 78.00 | 78.50 | 8 |
 
-The reproduction is below the paper's reported SUE number but preserves the core claim: under the same 8-dimensional embedding constraint, SUE substantially improves weakly paired retrieval over a paired-only contrastive baseline.
+Job `1162da06-1a4` produced the current checked-in `scoring/scores.json`: SUE mean R@10 69.125 versus the paired-only contrastive baseline at 54.25. The reproduction is below the paper's reported SUE number but preserves the core claim: under the same 8-dimensional embedding constraint, SUE substantially improves weakly paired retrieval over a paired-only contrastive baseline.
 
 ## Remaining
 
@@ -35,7 +36,9 @@ The reproduction is below the paper's reported SUE number but preserves the core
 - Job `07052327-9a9` failed only because `scores.json` included debug method names not present in `reference.json`; the method itself ran successfully.
 - Job `1711044e-d35` fixed that issue and passed all validation checks.
 - Job `f7e6c609-927` validated a proposed class-level mAP extension, but the resulting mAP scale did not match the paper's Appendix A.5 values. The extension was removed to avoid scoring a metric with an incompatible definition.
+- The paper has an internal pair-count inconsistency: Table 1/Table 12 report 100 paired samples for Handwritten, while Appendix E.8 says CCA used 600 pairs for all datasets. This reproduction follows the table setting because it is the reported Handwritten benchmark being scored.
 
 ## Deviations from Paper
 
 - The paper uses parametric SpectralNet for scalable spectral embedding. This reproduction uses the paper-described numeric spectral embedding plus Nyström extension on the small UCI Handwritten dataset. The core computation remains the same graph diffusion eigenvector embedding; this avoids unnecessary neural approximation for a 2000-sample tabular benchmark.
+- The Handwritten setup follows Table 1/Table 12's 100-pair weakly paired setting despite Appendix E.8's global 600-pair CCA statement.

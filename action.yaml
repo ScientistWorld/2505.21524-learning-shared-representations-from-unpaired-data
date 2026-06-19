@@ -1,8 +1,6 @@
 # IMPORTANT: Once you set action to 'submit' or 'done', STOP immediately.
 # Do NOT sleep, poll, or wait for jobs. The system reads this file
 # only after your turn ends. Sleeping blocks the entire pipeline.
-action: submit
-gpus: 0
-test: true
-milestone: method_runs
-notes: "CPU test job to validate deterministic spectral embedding patch after f193cea4-e7f passed core-claim reproduction in the managed container."
+action: done
+milestone: core_claim
+notes: "Core claim reproduced and validated in managed CPU job 1162da06-1a4: SUE mean R@10 69.125 vs contrastive 54.25, with artifact-based evaluation and structure checks passing."

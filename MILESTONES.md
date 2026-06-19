@@ -1,8 +1,14 @@
 # Reproduction Milestones
 
-**Current: method_runs**
+**Current: core_claim**
 
 ## Progress Log
+
+### [2026-06-19 17:12] - core_claim
+- Audited the resumed workspace against the paper's SUE algorithm: independent spectral embeddings, few-pair CCA, and unpaired MMD residual alignment are implemented for the Handwritten benchmark.
+- Confirmed managed CPU job `1162da06-1a4` completed `bash scripts/run.sh` and `python validate.py --compare` with all checks passing.
+- Final validated scores support the core claim: SUE mean R@10 69.125 versus reproduced paired-only contrastive mean R@10 54.25 in the same 8-dimensional shared space.
+- Documented the paper's CCA pair-count inconsistency: Table 1/Table 12 use 100 pairs for Handwritten, while Appendix E.8 states 600 pairs globally; this gym follows the Handwritten table setting.
 
 ### [2026-06-12 14:34] - method_runs
 - Continued from a reset audit point.
@@ -30,4 +36,4 @@
 - Confirmed `eval/` remains method-independent and scores saved artifacts from `artifacts/*.npz`.
 
 ## Stop Justification
-- Completed at milestone `method_runs`.
+- Completed at milestone `core_claim`.
