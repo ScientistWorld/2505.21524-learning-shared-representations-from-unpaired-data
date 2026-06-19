@@ -1,0 +1,33 @@
+{
+  "_slice": "test",
+  "experiments": {
+    "handwritten_retrieval": {
+      "results": {
+        "contrastive": {
+          "embedding_dim": 8.0,
+          "k2p_r@1": 19.0,
+          "k2p_r@10": 65.5,
+          "k2p_r@5": 52.0,
+          "mean_median_rank": 5.0,
+          "mean_mrr": 34.22694868007882,
+          "mean_r@10": 66.0,
+          "p2k_r@1": 18.5,
+          "p2k_r@10": 66.5,
+          "p2k_r@5": 52.0
+        },
+        "sue": {
+          "embedding_dim": 8.0,
+          "k2p_r@1": 28.000000000000004,
+          "k2p_r@10": 84.0,
+          "k2p_r@5": 70.5,
+          "mean_median_rank": 3.5,
+          "mean_mrr": 45.65522352563177,
+          "mean_r@10": 83.25,
+          "p2k_r@1": 28.000000000000004,
+          "p2k_r@10": 82.5,
+          "p2k_r@5": 65.0
+        }
+      }
+    }
+  }
+}
