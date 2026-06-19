@@ -1,5 +1,5 @@
-action: submit
+action: done
 gpus: 0
-test: true
+test: false
 milestone: core_claim
-notes: "CPU test job to regenerate baseline/SUE artifacts via scripts/reproduce.sh, refresh scores.json with current evaluator metrics, run train/test slices, and validate."
+notes: "Final verification passed; compact Handwritten retrieval gym is ready at core_claim."

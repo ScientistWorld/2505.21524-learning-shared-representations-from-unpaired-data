@@ -8,32 +8,32 @@
         "k2p_r@1": {
           "higher_is_better": true,
           "coefficient": 0.5,
-          "description": "Exact keypoint-to-pixel nearest-neighbor retrieval catches methods that only place the true pair somewhere in the top ten."
+          "description": "Exact coefficient-to-pixel nearest-neighbor retrieval catches methods that only place the true pair somewhere in the top ten."
         },
         "k2p_r@5": {
           "higher_is_better": true,
           "coefficient": 0.5,
-          "description": "Keypoint-to-pixel recall at five measures tighter retrieval quality than the headline top-ten metric."
+          "description": "Coefficient-to-pixel recall at five measures tighter retrieval quality than the headline top-ten metric."
         },
         "k2p_r@10": {
           "higher_is_better": true,
           "coefficient": 1.0,
-          "description": "Keypoint-to-pixel recall at ten follows the paper's retrieval-style benefit metric."
+          "description": "Coefficient-to-pixel recall at ten follows the paper's retrieval-style benefit metric."
         },
         "p2k_r@1": {
           "higher_is_better": true,
           "coefficient": 0.5,
-          "description": "Exact pixel-to-keypoint nearest-neighbor retrieval checks that the shared representation works in the reverse direction."
+          "description": "Exact pixel-to-coefficient nearest-neighbor retrieval checks that the shared representation works in the reverse direction."
         },
         "p2k_r@5": {
           "higher_is_better": true,
           "coefficient": 0.5,
-          "description": "Pixel-to-keypoint recall at five measures reverse-direction retrieval before the broader top-ten cutoff."
+          "description": "Pixel-to-coefficient recall at five measures reverse-direction retrieval before the broader top-ten cutoff."
         },
         "p2k_r@10": {
           "higher_is_better": true,
           "coefficient": 1.0,
-          "description": "Pixel-to-keypoint recall at ten prevents one-direction-only improvements from dominating the score."
+          "description": "Pixel-to-coefficient recall at ten prevents one-direction-only improvements from dominating the score."
         },
         "mean_r@10": {
           "higher_is_better": true,

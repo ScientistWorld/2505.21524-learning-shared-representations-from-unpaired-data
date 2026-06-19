@@ -6,7 +6,7 @@ The primary metric is cross-view Recall@10 on a held-out paired test set, averag
 
 ## Baselines and Targets
 
-The paper reports Handwritten retrieval with 100 paired examples and 1900 unpaired examples. Reported targets are SUE at 79.0 K2P R@10 and 78.0 P2K R@10, compared with a contrastive baseline at 28.0 K2P R@10 and 30.5 P2K R@10.
+The paper reports Handwritten retrieval with 100 paired examples and 1900 unpaired examples. The reported proposed method reaches 79.0 K2P R@10 and 78.0 P2K R@10, compared with a paired-only neural baseline at 28.0 K2P R@10 and 30.5 P2K R@10.
 
 ## Evaluation Protocol
 

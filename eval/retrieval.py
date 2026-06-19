@@ -56,8 +56,12 @@ def main() -> None:
     args = parser.parse_args()
 
     artifact_dir = Path(args.artifact_dir)
+    artifacts = sorted(artifact_dir.glob("*.npz"))
+    if not artifacts:
+        raise FileNotFoundError(f"No .npz artifacts found in {artifact_dir}")
+
     scores: dict[str, dict[str, dict[str, float]]] = {"experiments": {}}
-    for artifact in sorted(artifact_dir.glob("*.npz")):
+    for artifact in artifacts:
         experiment, method, metrics = evaluate_artifact(artifact)
         scores["experiments"].setdefault(experiment, {"results": {}})
         scores["experiments"][experiment]["results"][method] = metrics

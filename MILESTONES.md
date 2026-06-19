@@ -4,6 +4,11 @@
 
 ## Progress Log
 
+### [2026-06-19 17:55] - core_claim
+- Completed final verification of the `core_claim` workspace.
+- Refreshed `scoring/scores.json` to include all current evaluator metrics and re-ran `python validate.py --compare` successfully.
+- Removed generated job and trajectory logs from git tracking, tightened method-agnostic evaluation wording, and added an evaluator guard for missing artifacts.
+
 ### [2026-06-19 17:45] - core_claim
 - Audited final packaging after a continuation handoff.
 - Fixed `scripts/run.sh` so submitted jobs regenerate baseline and SUE artifacts before scoring, instead of relying on stale ignored `.npz` files.
