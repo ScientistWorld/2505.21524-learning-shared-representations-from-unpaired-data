@@ -22,6 +22,6 @@ cd /home/user
 mkdir -p data/downloads
 
 if [ ! -e data/downloads/multiple_features.zip ]; then
-  curl -L https://archive.ics.uci.edu/static/public/72/multiple+features.zip \
+  curl --fail --location --retry 3 https://archive.ics.uci.edu/static/public/72/multiple+features.zip \
     -o data/downloads/multiple_features.zip
 fi
