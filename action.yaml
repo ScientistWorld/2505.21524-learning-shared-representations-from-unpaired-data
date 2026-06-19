@@ -1,5 +1,3 @@
-action: submit
-gpus: 0
-test: true
+action: done
 milestone: core_claim
-notes: "Regenerate Handwritten SUE and contrastive artifacts with explicit supervision-budget metrics, refresh scores/train/test scores, and run validate.py --compare."
+notes: "Final verification passed; score files include budget metrics and validation passes."

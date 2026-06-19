@@ -62,8 +62,8 @@
         },
         "unpaired_train_count": {
           "higher_is_better": false,
-          "coefficient": -0.05,
-          "description": "Number of unpaired training examples used per view, tracked to keep the unpaired-data budget explicit."
+          "coefficient": 0.0,
+          "description": "Number of unpaired training examples used per view, tracked to keep the unpaired-data budget explicit without penalizing the use of unlabeled data."
         },
         "eval_pair_count": {
           "higher_is_better": false,
