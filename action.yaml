@@ -1,5 +1,5 @@
-action: done
+action: submit
 gpus: 0
 test: false
 milestone: core_claim
-notes: "Stratified artifact split; 20 train metrics and 20 test metrics across SUE and contrastive; SUE mean_r@10 train/test 86.25/83.25, contrastive 73.5/66.0; no nulls, method sets match, moderate train/test gaps."
+notes: "Rerun split scoring after fixing train/test evaluators to split queries while ranking against the full artifact gallery."

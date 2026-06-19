@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 from pathlib import Path
 
@@ -20,11 +21,19 @@ def stratified_slice_indices(labels: np.ndarray) -> np.ndarray:
     if labels.ndim != 1:
         raise ValueError("labels must be a one-dimensional array")
 
-    rng = np.random.default_rng(SPLIT_SEED)
     selected: list[np.ndarray] = []
     for label in sorted(np.unique(labels).tolist(), key=str):
         group = np.flatnonzero(labels == label)
-        shuffled = group[rng.permutation(len(group))]
+        shuffled = np.array(
+            sorted(
+                group.tolist(),
+                key=lambda idx: hashlib.blake2b(
+                    f"{SPLIT_SEED}:{repr(label)}:{int(idx)}".encode("utf-8"),
+                    digest_size=8,
+                ).digest(),
+            ),
+            dtype=np.int64,
+        )
         selected.append(np.sort(shuffled[(len(shuffled) + 1) // 2 :]))
 
     if not selected:
@@ -32,14 +41,19 @@ def stratified_slice_indices(labels: np.ndarray) -> np.ndarray:
     return np.sort(np.concatenate(selected))
 
 
-def retrieval_rank_metrics(similarity: np.ndarray, ks: tuple[int, ...] = (1, 5, 10)) -> dict[str, float]:
-    n = similarity.shape[0]
+def retrieval_rank_metrics(
+    similarity: np.ndarray,
+    target_indices: np.ndarray,
+    ks: tuple[int, ...] = (1, 5, 10),
+) -> dict[str, float]:
+    n_queries, n_gallery = similarity.shape
+    if target_indices.shape[0] != n_queries:
+        raise ValueError("target_indices length must match the number of query rows")
     order = np.argsort(-similarity, axis=1)
-    ranks = np.empty(n, dtype=np.int64)
-    target = np.arange(n)
-    for i in range(n):
-        ranks[i] = int(np.where(order[i] == target[i])[0][0]) + 1
-    metrics = {f"r@{k}": float(np.mean(ranks <= min(k, n)) * 100.0) for k in ks}
+    ranks = np.empty(n_queries, dtype=np.int64)
+    for i, target in enumerate(target_indices):
+        ranks[i] = int(np.where(order[i] == target)[0][0]) + 1
+    metrics = {f"r@{k}": float(np.mean(ranks <= min(k, n_gallery)) * 100.0) for k in ks}
     metrics["mrr"] = float(np.mean(1.0 / ranks) * 100.0)
     metrics["median_rank"] = float(np.median(ranks))
     return metrics
@@ -67,12 +81,14 @@ def evaluate_artifact(path: Path) -> tuple[str, str, dict[str, float]]:
         raise ValueError(f"{path} has {labels.shape[0]} labels for {x.shape[0]} embeddings")
 
     indices = stratified_slice_indices(labels)
-    x = normalize(x[indices])
-    y = normalize(y[indices])
-    xy_similarity = x @ y.T
-    yx_similarity = y @ x.T
-    x_to_y = retrieval_rank_metrics(xy_similarity)
-    y_to_x = retrieval_rank_metrics(yx_similarity)
+    x_gallery = normalize(x)
+    y_gallery = normalize(y)
+    x_query = x_gallery[indices]
+    y_query = y_gallery[indices]
+    xy_similarity = x_query @ y_gallery.T
+    yx_similarity = y_query @ x_gallery.T
+    x_to_y = retrieval_rank_metrics(xy_similarity, indices)
+    y_to_x = retrieval_rank_metrics(yx_similarity, indices)
     metrics = {
         "k2p_r@1": x_to_y["r@1"],
         "k2p_r@5": x_to_y["r@5"],
