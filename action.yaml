@@ -5,4 +5,4 @@ action: submit
 gpus: 0
 test: false
 milestone: core_claim
-notes: "Hardened gym check: reproduce SUE + baseline under the new encoder interface and split, freeze baseline, score dev/test, validate, then run the hardening audit (seeds, better/weaker variants, shortcuts) through the hidden test."
+notes: "Recheck with the encoder guard: reproduce reference + baseline end to end, score dev/test, validate, rescore saved variant encoders and rerun all shortcut probes (incl. stash/evaluator-file probes) through the hidden test."

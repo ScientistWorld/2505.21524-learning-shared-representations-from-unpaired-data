@@ -1,5 +1,5 @@
 $ bash scripts/evaluate_test.sh
-[test] sue: ok | mean_r@10=75.12
+[test] sue: ok | mean_r@10=70.38
 {
   "_slice": "test",
   "_status": {
@@ -21,15 +21,15 @@ $ bash scripts/evaluate_test.sh
           "p2k_r@5": 42.5
         },
         "sue": {
-          "k2p_r@1": 24.5,
-          "k2p_r@10": 75.25,
-          "k2p_r@5": 58.5,
-          "mean_median_rank": 4.25,
-          "mean_mrr": 39.704061693273836,
-          "mean_r@10": 75.125,
-          "p2k_r@1": 24.5,
-          "p2k_r@10": 75.0,
-          "p2k_r@5": 56.00000000000001
+          "k2p_r@1": 22.5,
+          "k2p_r@10": 72.0,
+          "k2p_r@5": 51.5,
+          "mean_median_rank": 5.5,
+          "mean_mrr": 35.68589372024109,
+          "mean_r@10": 70.375,
+          "p2k_r@1": 20.0,
+          "p2k_r@10": 68.75,
+          "p2k_r@5": 49.25
         }
       }
     }
