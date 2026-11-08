@@ -36,7 +36,9 @@ For each view separately the evaluator writes that view's rows (raw feature valu
 <command> --view {kar|pix} --input <rows.npy> --output <embeddings.npy>
 ```
 
-with the repository root on `PYTHONPATH`. `"{model_dir}"` is replaced by a fresh private copy of your method directory; each call also gets a fresh working directory and `TMPDIR`. The output must be a finite numeric array of shape `(n_rows, 8)`, row `i` embedding input row `i`. Everything the encoder needs must be inside the method directory or the repository code. The two calls are independent: an encoder must map each row of one view to its embedding without information about the other view's evaluation rows.
+with the repository root on `PYTHONPATH`. The command must be a Python invocation, `["python", "-m", "<module>", ...]` or `["python", "<script>.py", ...]`. `"{model_dir}"` is replaced by a fresh private copy of your method directory; each call also gets a fresh working directory, `HOME` and `TMPDIR`. The output must be a finite numeric array of shape `(n_rows, 8)`, row `i` embedding input row `i`. Everything the encoder needs must be inside the method directory or the repository code. The two calls are independent: an encoder must map each row of one view to its embedding without information about the other view's evaluation rows.
+
+Encoders run under a guard that refuses (with `PermissionError`) any access to the evaluator directory `eval/`, any file write outside the call's private directory, starting other programs, and opening sockets. Reading repository code and `data/` is allowed; run single-process (threads are fine).
 
 A method whose encoder crashes, times out, writes nothing, or returns the wrong shape or non-finite values is scored as failed: every true match is counted as ranked last (all recalls 0, MRR 0.25, median rank 400). Self-reported numbers, counts or labels in the method directory are ignored.
 

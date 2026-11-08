@@ -31,9 +31,9 @@ SCORE_FILES = ("scores.json", "scores_train.json", "scores_test.json")
 SEEDS = (17, 29)
 VARIANTS = ("anchored", "richer", "richer_local", "no_mmd", "no_cca", "no_se")
 SHORTCUTS = (
-    "copy_input", "public_lookup", "metadata_claims", "test_size", "empty", "nan", "inf",
-    "constant", "wrong_dim", "direct_scores", "replace_baseline", "stash_sandboxed",
-    "stash_absolute",
+    "copy_input", "public_lookup", "read_evaluator_files", "metadata_claims", "test_size", "empty",
+    "nan", "inf", "constant", "wrong_dim", "direct_scores", "replace_baseline", "stash_sandboxed",
+    "stash_absolute", "stash_subprocess",
 )
 
 
@@ -89,16 +89,24 @@ def bootstrap(ranks: dict, coef: dict[str, float], reference: str = "sue", reps:
 
 
 def variants(coef: dict[str, float]) -> dict:
+    # Saved variant encoders are reused (rescored, not retrained) when present;
+    # the reference is always the current artifacts/sue.
     combined = WORK / "combined"
-    shutil.rmtree(combined, ignore_errors=True)
-    combined.mkdir(parents=True)
+    combined.mkdir(parents=True, exist_ok=True)
+    shutil.rmtree(combined / "sue", ignore_errors=True)
     shutil.copytree(ROOT / "artifacts" / "sue", combined / "sue")
     trained = {}
     for seed in SEEDS:
         name = f"sue_seed{seed}"
+        if (combined / name / "encoder.json").is_file():
+            trained[name] = "reused"
+            continue
         trained[name] = run([sys.executable, "-m", "method.sue", "train", "--seed", str(seed),
                              "--output-dir", str(combined / name)], LOGS / f"train_{name}.log")
     for name in VARIANTS:
+        if (combined / name / "encoder.json").is_file():
+            trained[name] = "reused"
+            continue
         trained[name] = run([sys.executable, "-m", "redteam.hardening.variants", "train", "--variant", name,
                              "--output-dir", str(combined / name)], LOGS / f"train_{name}.log")
     out = {"train_returncodes": trained}

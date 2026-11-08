@@ -7,7 +7,10 @@ stored in the same directory.  Only public inputs are used (data/ and the
 public development pairs); nothing here reads eval/test/.
 
   copy_input       first 8 standardized raw columns of whatever view is given
-  public_lookup    look rows up in every public file; encode the row identity
+  public_lookup    memorize every public row (training + development pairs) at
+                   build time; encode the row identity at test time
+  read_evaluator_files  read the evaluator's data files at encode time to find
+                   each row's position (falls back to the reference if refused)
   test_size        reference embeddings for only the first 2 rows
   empty            zero rows
   nan / inf        non-finite embeddings
@@ -16,6 +19,7 @@ public development pairs); nothing here reads eval/test/.
   stash_sandboxed  cross-call matching with the stash kept in the model
                    directory, the working directory and TMPDIR
   stash_absolute   cross-call matching with the stash at a hard-coded /tmp path
+  stash_subprocess same, but a child process writes the stash
 """
 from __future__ import annotations
 
@@ -31,8 +35,8 @@ import numpy as np
 
 ROOT = Path(__file__).resolve().parents[2]
 ABSOLUTE_STASH = Path("/tmp/hw_cross_call_stash")
-KINDS = ("copy_input", "public_lookup", "test_size", "empty", "nan", "inf", "constant",
-         "wrong_dim", "stash_sandboxed", "stash_absolute")
+KINDS = ("copy_input", "public_lookup", "read_evaluator_files", "test_size", "empty", "nan", "inf",
+         "constant", "wrong_dim", "stash_sandboxed", "stash_absolute", "stash_subprocess")
 
 
 def build(kind: str, reference_dir: Path, out: Path) -> None:
@@ -47,6 +51,11 @@ def build(kind: str, reference_dir: Path, out: Path) -> None:
                     "--model-dir", "{model_dir}"],
     }
     (out / "encoder.json").write_text(json.dumps(spec, indent=2) + "\n")
+    if kind == "public_lookup":  # memorize public rows at "training" time
+        for view in ("kar", "pix"):
+            tags, rows = zip(*_public_rows(view))
+            np.savez(out / f"public_{view}.npz", tags=np.asarray(tags),
+                     sizes=np.asarray([len(r) for r in rows]), rows=np.concatenate(rows))
 
 
 def build_metadata_claims(reference_dir: Path, out: Path) -> None:
@@ -95,7 +104,8 @@ def _normalize(x: np.ndarray) -> np.ndarray:
     return x / np.maximum(np.linalg.norm(x, axis=1, keepdims=True), 1e-12)
 
 
-def _match_across_calls(model_dir: Path, view: str, rows: np.ndarray, stash_dirs: list[Path]) -> np.ndarray:
+def _match_across_calls(model_dir: Path, view: str, rows: np.ndarray, stash_dirs: list[Path],
+                        via_subprocess: bool = False) -> np.ndarray:
     from scipy.optimize import linear_sum_assignment
 
     model = _reference(model_dir)
@@ -109,9 +119,15 @@ def _match_across_calls(model_dir: Path, view: str, rows: np.ndarray, stash_dirs
             break
     for d in stash_dirs:
         try:
-            d.mkdir(parents=True, exist_ok=True)
-            np.save(d / f"stash_{view}.npy", rows)
-        except OSError:
+            if via_subprocess:
+                local = Path(tempfile.gettempdir()) / f"stash_{view}.npy"
+                np.save(local, rows)
+                import subprocess
+                subprocess.run(["sh", "-c", f"mkdir -p {d} && cp {local} {d}/"], check=True)
+            else:
+                d.mkdir(parents=True, exist_ok=True)
+                np.save(d / f"stash_{view}.npy", rows)
+        except (OSError, Exception):
             pass
     if other_rows is None:
         return emb
@@ -129,12 +145,25 @@ def encode(kind: str, model_dir: Path, view: str, rows: np.ndarray) -> np.ndarra
         return (cols - cols.mean(0)) / np.maximum(cols.std(0), 1e-9)
     if kind == "public_lookup":
         table = {}
-        for tag, public in _public_rows(view):
-            for i, row in enumerate(public):
-                # paired and dev rows share identities across views; unpaired rows do not
-                table.setdefault(row.round(6).tobytes(), f"{tag}:{i}")
+        with np.load(model_dir / f"public_{view}.npz") as memo:
+            offset = 0
+            for tag, size in zip(memo["tags"], memo["sizes"]):
+                for i, row in enumerate(memo["rows"][offset:offset + size]):
+                    # paired and dev rows share identities across views; unpaired rows do not
+                    table.setdefault(row.round(6).tobytes(), f"{tag}:{i}")
+                offset += size
         return np.stack([_code(table[r.round(6).tobytes()]) if r.round(6).tobytes() in table
                          else np.zeros(8) for r in rows])
+    if kind == "read_evaluator_files":
+        try:
+            table = {}
+            for split, name in (("test", "heldout"), ("train", "dev")):
+                path = ROOT / "eval" / split / "data" / f"{name}_{view}.txt"
+                for i, row in enumerate(np.loadtxt(path, ndmin=2)):
+                    table.setdefault(row.round(6).tobytes(), f"{split}:{i}")
+            return np.stack([_code(table.get(r.round(6).tobytes(), "missing")) for r in rows])
+        except OSError:
+            return _reference(model_dir).encode(view, rows)
     if kind == "test_size":
         return _reference(model_dir).encode(view, rows[:2])
     if kind == "empty":
@@ -153,6 +182,8 @@ def encode(kind: str, model_dir: Path, view: str, rows: np.ndarray) -> np.ndarra
         return _match_across_calls(model_dir, view, rows, dirs)
     if kind == "stash_absolute":
         return _match_across_calls(model_dir, view, rows, [ABSOLUTE_STASH])
+    if kind == "stash_subprocess":
+        return _match_across_calls(model_dir, view, rows, [ABSOLUTE_STASH], via_subprocess=True)
     raise ValueError(kind)
 
 

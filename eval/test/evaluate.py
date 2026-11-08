@@ -45,6 +45,70 @@ ROOT = Path(__file__).resolve().parents[2]
 DATA_DIR = Path(__file__).resolve().parent / "data"
 
 
+# Each encoder call runs under this bootstrap: a Python audit hook that refuses
+# (with PermissionError) any access to the evaluator directory, any file write
+# outside the call's private sandbox, starting other programs, and sockets;
+# then the method's module or script runs as __main__.
+GUARD_BOOTSTRAP = r"""
+import os, runpy, sys
+_sandbox = os.path.realpath(os.environ["HW_ENCODER_SANDBOX"])
+_protected = os.path.realpath(os.environ["HW_EVALUATOR_DIR"])
+_write_flags = os.O_WRONLY | os.O_RDWR | os.O_CREAT | os.O_TRUNC | os.O_APPEND
+_process = {"subprocess.Popen", "os.system", "os.exec", "os.posix_spawn", "os.spawn", "pty.spawn"}
+_socket = {"socket.bind", "socket.connect", "socket.sendto", "socket.sendmsg"}
+_mutate = {"os.mkdir", "os.remove", "os.rmdir", "os.truncate", "os.mkfifo", "os.mknod", "os.chmod",
+           "os.chown", "os.utime", "os.setxattr", "os.removexattr", "shutil.rmtree"}
+def _real(p):
+    if p is None or isinstance(p, int):
+        return None
+    try:
+        return os.path.realpath(os.fsdecode(p))
+    except (TypeError, ValueError):
+        return None
+def _under(p, root):
+    return p == root or p.startswith(root + os.sep)
+def _no_evaluator(p):
+    r = _real(p)
+    if r is not None and _under(r, _protected):
+        raise PermissionError("encoders may not access evaluator files: " + r)
+def _sandboxed(p):
+    r = _real(p)
+    if r is not None and not (_under(r, _sandbox) or r == os.devnull):
+        raise PermissionError("encoders may only write inside their private directory: " + r)
+def _hook(event, args):
+    if event == "open":
+        path, mode, flags = (tuple(args) + (None, None, None))[:3]
+        _no_evaluator(path)
+        if (flags or 0) & _write_flags or (isinstance(mode, str) and any(c in mode for c in "wax+")):
+            _sandboxed(path)
+    elif event in ("os.listdir", "os.scandir", "os.chdir", "glob.glob"):
+        if args:
+            _no_evaluator(args[0])
+    elif event in _mutate:
+        if args:
+            _no_evaluator(args[0])
+            _sandboxed(args[0])
+    elif event in ("os.rename", "os.link"):
+        for p in args[:2]:
+            _no_evaluator(p)
+            _sandboxed(p)
+    elif event == "os.symlink":
+        _sandboxed(args[1])
+    elif event in _process:
+        raise PermissionError("encoders may not start other programs")
+    elif event in _socket:
+        raise PermissionError("encoders may not use sockets")
+sys.addaudithook(_hook)
+_argv = sys.argv[1:]
+if _argv[0] == "-m":
+    sys.argv = _argv[1:]
+    runpy.run_module(_argv[1], run_name="__main__", alter_sys=True)
+else:
+    sys.argv = _argv
+    runpy.run_path(_argv[0], run_name="__main__")
+"""
+
+
 class EncoderError(Exception):
     pass
 
@@ -83,6 +147,10 @@ def load_command(method_dir: Path) -> list[str]:
     command = spec.get("command") if isinstance(spec, dict) else None
     if not isinstance(command, list) or not command or not all(isinstance(c, str) for c in command):
         raise EncoderError("encoder.json must contain a non-empty 'command' list of strings")
+    is_module = len(command) >= 3 and command[1] == "-m"
+    is_script = len(command) >= 2 and command[1].endswith(".py")
+    if command[0] not in ("python", "python3") or not (is_module or is_script):
+        raise EncoderError("command must be ['python', '-m', <module>, ...] or ['python', <script.py>, ...]")
     return command
 
 
@@ -98,15 +166,19 @@ def run_encoder(method_dir: Path, command: list[str], view: str, rows: np.ndarra
         rows_path = tmp / "rows.npy"
         out_path = tmp / "embeddings.npy"
         np.save(rows_path, np.ascontiguousarray(rows, dtype=np.float64))
-        argv = [
-            sys.executable if i == 0 and part in ("python", "python3")
-            else part.replace("{model_dir}", str(model_copy))
-            for i, part in enumerate(command)
-        ]
+        home = tmp / "home"
+        home.mkdir()
+        argv = [sys.executable, "-c", GUARD_BOOTSTRAP]
+        argv += [part.replace("{model_dir}", str(model_copy)) for part in command[1:]]
         argv += ["--view", view, "--input", str(rows_path), "--output", str(out_path)]
         env = dict(os.environ)
         env["PYTHONPATH"] = os.pathsep.join(p for p in (str(ROOT), env.get("PYTHONPATH", "")) if p)
         env["TMPDIR"] = env["TMP"] = env["TEMP"] = str(scratch)
+        env["HOME"] = str(home)
+        env["XDG_CACHE_HOME"] = str(home / ".cache")
+        env["PYTHONDONTWRITEBYTECODE"] = "1"
+        env["HW_ENCODER_SANDBOX"] = str(tmp)
+        env["HW_EVALUATOR_DIR"] = str(ROOT / "eval")
         try:
             proc = subprocess.run(
                 argv, cwd=work, env=env, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,

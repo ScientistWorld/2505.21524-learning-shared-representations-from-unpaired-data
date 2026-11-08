@@ -6,7 +6,7 @@ Train only on `data/handwritten/` (via `data/handwritten.py`): 100 known pairs a
 
 ## Representation and encoders
 
-Submit one encoder per view through `artifacts/<name>/encoder.json` (see `briefing/evaluation.md`). Each encoder returns an 8-dimensional embedding per input row. Encoders must be functions of the trained model and the rows of the view they are given: they must not read evaluator files, write or read state shared between calls (including fixed paths such as `/tmp/...`), or otherwise use information about the other view's evaluation rows.
+Submit one encoder per view through `artifacts/<name>/encoder.json` (see `briefing/evaluation.md`). Each encoder returns an 8-dimensional embedding per input row. Encoders must be functions of the trained model and the rows of the view they are given: they must not read evaluator files, write or read state shared between calls (including fixed paths such as `/tmp/...`), or otherwise use information about the other view's evaluation rows. The evaluator enforces this with a guard that refuses evaluator-file access, writes outside the call's private directory, child programs and sockets; working around the guard is out of bounds.
 
 ## Evaluation
 
