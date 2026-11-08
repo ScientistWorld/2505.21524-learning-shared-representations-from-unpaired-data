@@ -1,0 +1,43 @@
+{
+  "candidate_key": "sue",
+  "case": "honest_richer",
+  "contributions": {
+    "embedding_dim": -0.0,
+    "eval_pair_count": 0.0,
+    "k2p_r@1": 2.75,
+    "k2p_r@10": 9.0,
+    "k2p_r@5": 4.25,
+    "mean_median_rank": 0.44999999999999996,
+    "mean_mrr": 3.858519738260856,
+    "mean_r@10": 9.25,
+    "p2k_r@1": 0.25,
+    "p2k_r@10": 9.5,
+    "p2k_r@5": 3.9999999999999964,
+    "paired_train_count": -0.0,
+    "unpaired_train_count": 0.0
+  },
+  "elapsed_seconds": 32.49390107602812,
+  "finite_rank": true,
+  "method_returncode": 0,
+  "metrics": {
+    "embedding_dim": 8.0,
+    "eval_pair_count": 400.0,
+    "k2p_r@1": 22.5,
+    "k2p_r@10": 79.0,
+    "k2p_r@5": 59.0,
+    "mean_median_rank": 4.0,
+    "mean_mrr": 39.92525627070091,
+    "mean_r@10": 80.25,
+    "p2k_r@1": 23.0,
+    "p2k_r@10": 81.5,
+    "p2k_r@5": 56.49999999999999,
+    "paired_train_count": 100.0,
+    "unpaired_train_count": 1350.0
+  },
+  "rank_delta": 43.308519738260856,
+  "reference": "original scoring/scores_test.json: handwritten_retrieval/sue",
+  "status": "scored",
+  "test_command": "bash scripts/evaluate_test.sh",
+  "test_returncode": 0,
+  "train_returncode": 0
+}

@@ -1,4 +1,4 @@
 action: submit
 gpus: 0
 test: false
-notes: "Bundled gym scoring audit: three fixed-split reference seeds, four genuine variants, weak alignment ablation, retrained baseline, and thirteen artifact shortcuts; pristine no-argument hidden test for every case."
+notes: "Second bundled scoring audit: reuse newly generated valid reference outputs, rerun all thirteen shortcuts, and test six stronger genuine alignment variants. First-job results and schema failure diagnosis saved under redteam/."

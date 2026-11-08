@@ -1,0 +1,13 @@
+$ python -m redteam.honest_contrastive_alignment.method
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/user/redteam/honest_contrastive_alignment/method.py", line 3, in <module>
+    main('honest_contrastive_alignment', Path('artifacts'))
+  File "/home/user/redteam/honest.py", line 106, in main
+    model = anchored(zy, zx, seed, epochs, weight,
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/redteam/honest.py", line 69, in anchored
+    si, ti = s[a[start:start+64]], t[b[start:start+64]]
+             ~^^^^^^^^^^^^^^^^^^^
+IndexError: tensors used as indices must be long, int, byte or bool tensors

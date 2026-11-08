@@ -1,0 +1,10 @@
+{
+  "case": "honest_contrastive_alignment",
+  "elapsed_seconds": 22.057788233971223,
+  "error": "candidate failed to generate artifacts",
+  "method_returncode": 1,
+  "rank_delta": null,
+  "reference": "original scoring/scores_test.json: handwritten_retrieval/sue",
+  "status": "error",
+  "test_command": "bash scripts/evaluate_test.sh"
+}
