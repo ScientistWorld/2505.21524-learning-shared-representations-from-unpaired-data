@@ -1,8 +1,6 @@
 # Once you set action to 'submit' or 'done', STOP immediately.
 # Do NOT sleep, poll, or wait for jobs. The system reads this file
 # only after your turn ends.
-action: submit
-gpus: 0
-test: false
+action: done
 milestone: core_claim
-notes: "Recheck with the encoder guard: reproduce reference + baseline end to end, score dev/test, validate, rescore saved variant encoders and rerun all shortcut probes (incl. stash/evaluator-file probes) through the hidden test."
+notes: "Hardened gym: evaluator-owned hidden split, guarded per-view encoder interface, gates and frozen baseline; reference SUE 70.38 vs baseline 56.38 hidden-test R@10, better variants +23..+58 above seed noise, all shortcuts closed (see HARDENING.md)."
