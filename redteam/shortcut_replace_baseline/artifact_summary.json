@@ -1,0 +1,16 @@
+{
+  "contrastive_handwritten.npz": {
+    "complementary_test_queries": 200,
+    "embedding_dimensions": 8,
+    "gallery_rows": 400,
+    "label_classes": 10,
+    "visible_train_queries": 200
+  },
+  "sue_handwritten.npz": {
+    "complementary_test_queries": 200,
+    "embedding_dimensions": 8,
+    "gallery_rows": 400,
+    "label_classes": 10,
+    "visible_train_queries": 200
+  }
+}

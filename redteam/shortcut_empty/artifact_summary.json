@@ -1,0 +1,9 @@
+{
+  "sue_handwritten.npz": {
+    "complementary_test_queries": 0,
+    "embedding_dimensions": 8,
+    "gallery_rows": 0,
+    "label_classes": 0,
+    "visible_train_queries": 0
+  }
+}

@@ -1,4 +1,4 @@
 action: submit
 gpus: 0
 test: false
-notes: "Second bundled scoring audit: reuse newly generated valid reference outputs, rerun all thirteen shortcuts, and test six stronger genuine alignment variants. First-job results and schema failure diagnosis saved under redteam/."
+notes: "Final short audit job: rerun one optional genuine alignment variant after fixing index-variable shadowing, reuse every completed score, and save actual gallery/query counts for all shortcut artifacts. Robust honest gains and major shortcuts already demonstrated."
