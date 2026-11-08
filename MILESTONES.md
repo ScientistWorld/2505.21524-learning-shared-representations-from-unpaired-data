@@ -4,6 +4,10 @@
 
 ## Progress Log
 
+### [2026-11-08 07:30] - core_claim
+- Hardened the gym (see `HARDENING.md`): evaluator-owned held-out split (secret seed, rows only in `eval/test/`), public data reduced to 100 pairs + 990 unpaired rows per view, per-view encoder interface with isolated, guarded encoder calls, shape/finiteness/8-D gates, pessimistic ties, frozen paired-only baseline, self-reported budget fields removed from scoring.
+- Jobs `1f17f5dc-f16` and `fc8d1d2f-089`: SUE reproduces deterministically (hidden-test mean R@10 70.38 vs frozen contrastive 56.38; dev 67.50 vs 55.25); better variants score +22.7 to +57.6 (CIs exclude 0, seed spread 7.1); paper ablations score lower; all red-team shortcuts and new cross-call/evaluator-file probes earn nothing; `validate.py --post-design` passes.
+
 ### [2026-06-19 17:57] - core_claim
 - Completed final verification of the `core_claim` workspace.
 - Confirmed strict method-agnostic files do not leak the paper's algorithm and no committed code references `/home/user/shared`.

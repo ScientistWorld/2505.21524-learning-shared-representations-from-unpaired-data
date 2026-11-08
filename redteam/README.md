@@ -1,3 +1,5 @@
+> **Note (hardening iteration):** the scripts in this directory target the previous `.npz` artifact interface and no longer run against the current evaluators. The current audit is `redteam/hardening/` (`python -m redteam.hardening.audit`), reported in `HARDENING.md`.
+
 # Scoring audit
 
 Run the bundled CPU audit with `bash redteam/run_all.sh` in the gym container.

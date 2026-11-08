@@ -15,6 +15,13 @@
 - Follow-up audit on 2026-06-19 confirmed separation and artifact-based scoring, then promoted `paired_train_count`, `unpaired_train_count`, and `eval_pair_count` into the artifact and scoring schema.
 - Final verification on 2026-06-19 refreshed the checked-in score files with the supervision-budget metrics and passed `python validate.py --compare`.
 
+## Hardening (2026-11-08)
+
+- The evaluation was rebuilt (details and evidence in `HARDENING.md`). Public training data is `data/handwritten/` (100 known pairs + 990 unpaired rows per view, no labels); 400 development pairs are in `eval/train/data/`; 400 held-out pairs exist only in `eval/test/`.
+- Methods submit per-view encoders (`artifacts/<name>/encoder.json`); the evaluators recompute every metric, gate shape/dimension/finiteness, and report a frozen paired-only baseline.
+- Current reference (job `fc8d1d2f-089`): hidden test SUE mean R@10 70.375 / MRR 35.69 vs contrastive 56.375 / 27.99; development SUE 67.50 vs contrastive 55.25.
+- The results table below is from the earlier artifact-based protocol and is kept for history.
+
 ## Results
 
 Job `1162da06-1a4` produced the current validated Handwritten retrieval scores:
