@@ -20,7 +20,10 @@ def snapshot():
     CACHE.mkdir(parents=True, exist_ok=True)
     original = CACHE / 'original_artifacts'
     if not original.exists():
-        shutil.copytree(ROOT / 'artifacts', original)
+        if (ROOT / 'artifacts').exists():
+            shutil.copytree(ROOT / 'artifacts', original)
+        else:
+            original.mkdir()
     for name in SCORES:
         backup = CACHE / name
         if not backup.exists():
@@ -85,6 +88,24 @@ def run(case: str):
         result['method_returncode'] = prep
         if prep:
             raise RuntimeError('candidate failed to generate artifacts')
+        import numpy as np
+        from eval.train.evaluate import stratified_slice_indices
+        summaries = {}
+        for path in artifacts.glob('*.npz'):
+            with np.load(path, allow_pickle=False) as data:
+                labels = data['labels']
+                try:
+                    train_queries = len(stratified_slice_indices(labels))
+                except ValueError:
+                    train_queries = 0
+                summaries[path.name] = dict(
+                    gallery_rows=int(data['x_embeddings'].shape[0]),
+                    embedding_dimensions=int(data['x_embeddings'].shape[1]),
+                    label_classes=int(len(np.unique(labels))),
+                    visible_train_queries=train_queries,
+                    complementary_test_queries=int(len(labels) - train_queries),
+                )
+        result['artifact_summary'] = summaries
         result['train_returncode'] = execute(['bash', 'scripts/evaluate_train.sh'], folder / 'train.log')
         train_score = ROOT / 'scoring/scores_train.json'
         if train_score.exists():

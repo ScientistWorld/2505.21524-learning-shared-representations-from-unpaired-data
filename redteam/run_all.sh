@@ -20,3 +20,4 @@ for name in "${cases[@]}"; do
   fi
   bash "redteam/$name/run.sh"
 done
+python -m redteam.inspect_cached

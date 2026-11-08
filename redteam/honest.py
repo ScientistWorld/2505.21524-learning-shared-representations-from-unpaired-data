@@ -70,9 +70,9 @@ def anchored(source, target, seed, epochs, anchor_weight=1., contrastive=False):
             opt.zero_grad()
             loss = mmd_loss(model(si), ti) + anchor_weight * torch.mean((model(sp) - tp)**2)
             if contrastive:
-                a = torch.nn.functional.normalize(model(sp), dim=1)
-                b = torch.nn.functional.normalize(tp, dim=1)
-                logits = a @ b.T / .07
+                paired_source = torch.nn.functional.normalize(model(sp), dim=1)
+                paired_target = torch.nn.functional.normalize(tp, dim=1)
+                logits = paired_source @ paired_target.T / .07
                 targets = torch.arange(len(sp))
                 loss = loss + .5 * (torch.nn.functional.cross_entropy(logits, targets)
                                     + torch.nn.functional.cross_entropy(logits.T, targets))

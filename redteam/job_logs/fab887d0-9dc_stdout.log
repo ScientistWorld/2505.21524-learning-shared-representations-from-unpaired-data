@@ -1,0 +1,35 @@
+[hive] This stdout log is managed by Hive.
+[hive] job_id: 974d269d
+[hive] host: node
+[hive] node_id: 564a353c29b876abfd8df1b816b64d3399f5ef09a643b4a933c92d12
+[hive] user: nexus/user (remote)
+[hive] resource: gpu-cpu
+[hive] gpus: 0
+[hive] cpus: 1
+[hive] workdir: /home/user
+[hive] timeout_sec: 21600
+[hive] started_at: 2026-11-08 00:18:37 EST
+[hive] command: apptainer exec --containall --cleanenv --env HF_HOME=/home/user/shared/hf_cache --env TRANSFORMERS_CACHE=/home/user/shared/hf_cache --env HF_DATASETS_CACHE=/home/user/shared/hf_cache/datasets --env TORCH_HOME=/home/user/shared/hf_cache/torch --bind /home/user/scratch/AgentWorkspaces/workspaces/2505.21524:/home/user --overlay /home/user/scratch/AgentWorkspaces/workspaces/2505.21524/environment/overlay.img:ro --bind /home/user/scratch/AgentWorkspaces/shared/datasets:/home/user/shared/datasets:ro --bind /home/user/scratch/AgentWorkspaces/shared/models:/home/user/shared/models:ro --bind /home/user/scratch/AgentWorkspaces/shared/hf_cache:/home/user/shared/hf_cache /home/user/scratch/AgentWorkspaces/workspaces/2505.21524/environment/container.sif bash -c 'cd /home/user && bash /home/user/scripts/run.sh'
+{"case": "reference_stored", "status": "rejected", "rank_delta": null, "elapsed_seconds": 3.9416007311083376}
+{"case": "reference_seed_13", "status": "scored", "rank_delta": 0.004761904761909364, "elapsed_seconds": 81.70444293599576}
+{"case": "reference_seed_17", "status": "scored", "rank_delta": -3.425118885016667, "elapsed_seconds": 63.99267639196478}
+{"case": "reference_seed_29", "status": "scored", "rank_delta": -11.459448159753258, "elapsed_seconds": 38.195682153105736}
+{"case": "honest_more_training", "status": "scored", "rank_delta": -12.492960223935528, "elapsed_seconds": 35.64114365307614}
+{"case": "honest_more_unpaired", "status": "scored", "rank_delta": -38.56703301770734, "elapsed_seconds": 34.99591858196072}
+{"case": "honest_anchored", "status": "scored", "rank_delta": 11.082793583184667, "elapsed_seconds": 44.74234784510918}
+{"case": "honest_neighbors_30", "status": "scored", "rank_delta": -3.5786081581786053, "elapsed_seconds": 32.92546616704203}
+{"case": "weak_no_cca", "status": "scored", "rank_delta": -261.28497882500795, "elapsed_seconds": 32.72706805402413}
+{"case": "baseline_paired", "status": "scored", "rank_delta": -81.76500730767813, "elapsed_seconds": 38.55066693201661}
+{"case": "shortcut_raw_pair_lookup", "status": "rejected", "rank_delta": null, "elapsed_seconds": 8.330910210032016}
+{"case": "shortcut_copy_input", "status": "rejected", "rank_delta": null, "elapsed_seconds": 9.028058963129297}
+{"case": "shortcut_zero_budget", "status": "rejected", "rank_delta": null, "elapsed_seconds": 4.982013984117657}
+{"case": "shortcut_negative_budget", "status": "rejected", "rank_delta": null, "elapsed_seconds": 6.375663097947836}
+{"case": "shortcut_label_slice", "status": "rejected", "rank_delta": null, "elapsed_seconds": 3.284391306107864}
+{"case": "shortcut_test_size", "status": "rejected", "rank_delta": null, "elapsed_seconds": 3.0008190600201488}
+{"case": "shortcut_replace_baseline", "status": "rejected", "rank_delta": null, "elapsed_seconds": 5.090861315140501}
+{"case": "shortcut_direct_scores", "status": "rejected", "rank_delta": null, "elapsed_seconds": 4.2722461661323905}
+{"case": "shortcut_constant", "status": "rejected", "rank_delta": null, "elapsed_seconds": 2.415991153102368}
+{"case": "shortcut_empty", "status": "rejected", "rank_delta": null, "elapsed_seconds": 1.8931734070647508}
+{"case": "shortcut_nan", "status": "rejected", "rank_delta": null, "elapsed_seconds": 3.0584262961056083}
+{"case": "shortcut_null_budget", "status": "rejected", "rank_delta": null, "elapsed_seconds": 2.1141438628546894}
+{"case": "shortcut_infinite_embeddings", "status": "rejected", "rank_delta": null, "elapsed_seconds": 4.655005249893293}
