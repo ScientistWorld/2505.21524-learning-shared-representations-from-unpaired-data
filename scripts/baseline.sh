@@ -1,22 +1,17 @@
 #!/bin/bash
-# Run a baseline method from the paper.
+# Run the paper's paired-only contrastive baseline.
 #
-# Baselines are simple reference methods the paper compares against. 
-# Implement this only if applicable, i.e. the paper has baselines.
-# You do not need to implement all baselines to begin — 
-# just enough to validate that the evaluation pipeline works 
-# and provide a reference point. You can decide to expand more baselines later.
-# Each baseline must be actually run and scored through evaluate.sh
-# so the numbers are verified, not self-reported.
-# You can decide what this baseline script should do yourself.
+# Trains two MLP encoders on the 100 known pairs and writes an encoder
+# directory <OUTPUT_DIR>/contrastive/.  The evaluators report the frozen copy
+# of this baseline that they own (the name "contrastive" is reserved); this
+# script is how that frozen copy was produced.
 #
-# Usage:
-#   bash scripts/baseline.sh <name>
+# Usage: bash scripts/baseline.sh [OUTPUT_DIR]   (default: artifacts)
 
 set -e
 
 cd /home/user
 
 OUTPUT_DIR="${1:-artifacts}"
-python -m baseline.handwritten_baselines --output-dir "$OUTPUT_DIR"
+python -m baseline.handwritten_baselines train --output-dir "$OUTPUT_DIR/contrastive"
 bash scripts/evaluate.sh "$OUTPUT_DIR"

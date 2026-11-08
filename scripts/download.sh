@@ -1,27 +1,34 @@
 #!/bin/bash
 # Download all data and models needed for this environment.
 #
-# Run on a node with internet access BEFORE building the container
-# or submitting compute jobs.
+# Estimated total download size: 0 GB
+# Estimated disk usage after extraction: 0 GB
 #
-# This script should be idempotent — safe to run multiple times.
-# It should skip files that already exist.
+# Nothing has to be fetched.  The only source is the public UCI Multiple
+# Features archive (https://archive.ics.uci.edu/static/public/72/multiple+features.zip,
+# CC BY 4.0, sha256 898a50a7637f1ed5a8cee2493aaa0e7f4d52795c412f59b0969ec7c3046ee7bd).
+# The rows this gym uses are committed verbatim in git:
+#   data/handwritten/   public weakly paired training data (100 pairs + 990 unpaired rows per view)
+#   eval/train/data/    public development pairs used by scripts/evaluate_train.sh
+#   eval/test/data/     held-out pairs used by the hidden test
+# The full row-aligned archive is deliberately NOT placed in the workspace: it
+# would expose the held-out correspondences.  The evaluator directory that owns
+# the held-out split also holds the builder that re-derives every committed
+# file from the archive (it fetches the archive itself into a temporary
+# directory).  Python packages are installed by environment/setup.sh.
 #
-# Update the storage estimate below as you add downloads.
-#
-# Estimated total download size: 0.006 GB
-# Estimated disk usage after extraction: 0.006 GB
-#
-# This reproduction only needs the public UCI Multiple Features archive.
-# The script writes to workspace-local data/downloads/ for portability.
+# This script is idempotent and works from an empty data/downloads/.
 
 set -e
 
 cd /home/user
 
 mkdir -p data/downloads
-
-if [ ! -e data/downloads/multiple_features.zip ]; then
-  curl --fail --location --retry 3 https://archive.ics.uci.edu/static/public/72/multiple+features.zip \
-    -o data/downloads/multiple_features.zip
-fi
+for f in data/handwritten/paired_kar.txt data/handwritten/paired_pix.txt \
+         data/handwritten/unpaired_kar.txt data/handwritten/unpaired_pix.txt; do
+  if [ ! -s "$f" ]; then
+    echo "missing $f: restore it from git (git checkout -- $f)" >&2
+    exit 1
+  fi
+done
+echo "All data is committed in the repository; nothing to download."

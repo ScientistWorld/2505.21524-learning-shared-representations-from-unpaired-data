@@ -1,7 +1,23 @@
+"""Spectral Universal Embedding (SUE) for the Handwritten weakly paired task.
+
+Algorithm 1 of the paper:
+  1. independent spectral embeddings (SE) of each view from its own kNN graph
+     (random-walk Laplacian, Appendix E.5 affinities, numeric SE + Nystrom
+     out-of-sample extension instead of SpectralNet on this small dataset);
+  2. CCA fitted on the SEs of the few known pairs only;
+  3. a residual network on the CCA-aligned pix view trained with an MMD loss
+     on all (unpaired) samples.
+
+Usage:
+  python -m method.sue train  --output-dir artifacts/sue [--seed 13]
+  python -m method.sue encode --model-dir artifacts/sue --view kar|pix \
+                              --input rows.npy --output emb.npy
+"""
 from __future__ import annotations
 
 import argparse
 import json
+import pickle
 from pathlib import Path
 
 import numpy as np
@@ -10,8 +26,9 @@ from scipy import sparse
 from scipy.sparse.linalg import eigsh
 from sklearn.cross_decomposition import CCA
 from sklearn.metrics import pairwise_distances
+from sklearn.preprocessing import StandardScaler
 
-from data.handwritten import make_split
+from data.handwritten import EMBEDDING_DIM, WeaklyPairedData, load_weakly_paired
 
 
 def l2_normalize(x: np.ndarray, eps: float = 1e-12) -> np.ndarray:
@@ -19,7 +36,7 @@ def l2_normalize(x: np.ndarray, eps: float = 1e-12) -> np.ndarray:
 
 
 class NumericSpectralEmbedding:
-    """Random-walk spectral embedding with Nyström out-of-sample extension."""
+    """Random-walk spectral embedding with Nystrom out-of-sample extension."""
 
     def __init__(self, n_components: int = 10, n_neighbors: int = 100):
         self.n_components = n_components
@@ -59,8 +76,7 @@ class NumericSpectralEmbedding:
             if evecs[anchor, col] < 0:
                 evecs[:, col] *= -1.0
         self.eigenvalues = evals[1 : self.n_components + 1]
-        self.eigenvectors = d_inv_sqrt @ evecs[:, 1 : self.n_components + 1]
-        self._distances = distances
+        self.eigenvectors = np.asarray(d_inv_sqrt @ evecs[:, 1 : self.n_components + 1])
         return self
 
     def transform(self, x: np.ndarray) -> np.ndarray:
@@ -154,72 +170,167 @@ def transform_mmd(model: MMDResidual, x: np.ndarray) -> np.ndarray:
         return model(torch.tensor(x, dtype=torch.float32)).numpy()
 
 
-def run(args: argparse.Namespace) -> None:
-    split = make_split(n_test=args.n_test, n_paired=args.n_paired, seed=args.seed)
-    x_train_parts = [split.train_x[split.unpaired_x_indices], split.train_x[split.paired_indices]]
-    y_train_parts = [split.train_y[split.unpaired_y_indices], split.train_y[split.paired_indices]]
-    x_train = np.concatenate(x_train_parts, axis=0)
-    y_train = np.concatenate(y_train_parts, axis=0)
+class SUE:
+    """Per-view encoders f_kar = Q_kar o S_kar and f_pix = F o Q_pix o S_pix."""
 
-    se_x = NumericSpectralEmbedding(args.se_dim, args.neighbors)
-    se_y = NumericSpectralEmbedding(args.se_dim, args.neighbors)
-    sx_train = se_x.fit_transform(x_train)
-    sy_train = se_y.fit_transform(y_train)
-    sx_test = se_x.transform(split.test_x)
-    sy_test = se_y.transform(split.test_y)
+    def __init__(
+        self,
+        se_dim: int = 10,
+        shared_dim: int = EMBEDDING_DIM,
+        neighbors: int = 100,
+        mmd_epochs: int = 100,
+        batch_size: int = 64,
+        seed: int = 13,
+    ):
+        self.config = dict(
+            se_dim=se_dim,
+            shared_dim=shared_dim,
+            neighbors=neighbors,
+            mmd_epochs=mmd_epochs,
+            batch_size=batch_size,
+            seed=seed,
+        )
+        self.mmd: MMDResidual | None = None
 
-    paired_slice = slice(len(x_train) - args.n_paired, len(x_train))
-    cca = CCA(n_components=args.shared_dim, max_iter=1000)
-    cca.fit(sx_train[paired_slice], sy_train[paired_slice])
-    zx_train, zy_train = cca.transform(sx_train, sy_train)
-    zx_test, zy_test = cca.transform(sx_test, sy_test)
+    # -- training -----------------------------------------------------------
+    def fit(self, data: WeaklyPairedData, device: str = "cpu") -> "SUE":
+        cfg = self.config
+        x_rows = data.all_rows("kar")  # unpaired rows, then the known pairs
+        y_rows = data.all_rows("pix")
+        n_pairs = len(data.paired_kar)
+        self.scaler_kar = StandardScaler().fit(x_rows)
+        self.scaler_pix = StandardScaler().fit(y_rows)
+        x_std = self.scaler_kar.transform(x_rows).astype(np.float32)
+        y_std = self.scaler_pix.transform(y_rows).astype(np.float32)
 
-    mmd = train_mmd_residual(
-        source=zy_train,
-        target=zx_train,
-        epochs=args.mmd_epochs,
-        batch_size=args.batch_size,
-        seed=args.seed,
-        device=args.device,
-    )
-    zy_test_mmd = transform_mmd(mmd, zy_test)
+        # Step 1: independent spectral embeddings (no pairing information).
+        self.se_kar = NumericSpectralEmbedding(cfg["se_dim"], cfg["neighbors"])
+        self.se_pix = NumericSpectralEmbedding(cfg["se_dim"], cfg["neighbors"])
+        sx = self.se_kar.fit_transform(x_std)
+        sy = self.se_pix.fit_transform(y_std)
 
-    output_dir = Path(args.output_dir)
-    output_dir.mkdir(parents=True, exist_ok=True)
-    out = output_dir / "sue_handwritten.npz"
-    np.savez_compressed(
-        out,
-        method="sue",
-        experiment="handwritten_retrieval",
-        x_embeddings=zx_test.astype(np.float32),
-        y_embeddings=zy_test_mmd.astype(np.float32),
-        labels=split.test_labels.astype(np.int64),
-        paired_train_count=np.asarray(args.n_paired, dtype=np.float32),
-        unpaired_train_count=np.asarray(
-            min(len(split.unpaired_x_indices), len(split.unpaired_y_indices)),
-            dtype=np.float32,
-        ),
-        eval_pair_count=np.asarray(len(split.test_labels), dtype=np.float32),
-    )
-    torch.save({"mmd": mmd.state_dict(), "args": vars(args)}, output_dir / "sue_handwritten.pt")
-    with (output_dir / "sue_handwritten_meta.json").open("w") as f:
-        json.dump(vars(args), f, indent=2, sort_keys=True)
-    print(f"Wrote {out}")
+        # Step 2: CCA on the known pairs only (they are the last n_pairs rows).
+        paired = slice(len(x_rows) - n_pairs, len(x_rows))
+        self.cca = CCA(n_components=cfg["shared_dim"], max_iter=1000)
+        self.cca.fit(sx[paired], sy[paired])
+        zx = self._cca_kar(sx)
+        zy = self._cca_pix(sy)
+
+        # Step 3: residual MMD alignment of the pix view onto the kar view,
+        # using all samples without correspondences.
+        self.mmd = self._fit_residual(zy, zx, device)
+        return self
+
+    def _fit_residual(self, source: np.ndarray, target: np.ndarray, device: str) -> MMDResidual:
+        cfg = self.config
+        return train_mmd_residual(
+            source=source,
+            target=target,
+            epochs=cfg["mmd_epochs"],
+            batch_size=cfg["batch_size"],
+            seed=cfg["seed"],
+            device=device,
+        )
+
+    def _cca_kar(self, s: np.ndarray) -> np.ndarray:
+        return np.asarray(self.cca.transform(s), dtype=np.float32)
+
+    def _cca_pix(self, s: np.ndarray) -> np.ndarray:
+        dummy = np.zeros((len(s), self.cca.n_features_in_), dtype=np.float64)
+        _, zy = self.cca.transform(dummy, s)
+        return np.asarray(zy, dtype=np.float32)
+
+    # -- inference ----------------------------------------------------------
+    def encode(self, view: str, rows: np.ndarray) -> np.ndarray:
+        rows = np.asarray(rows, dtype=np.float64)
+        if view == "kar":
+            s = self.se_kar.transform(self.scaler_kar.transform(rows).astype(np.float32))
+            return self._cca_kar(s)
+        if view == "pix":
+            s = self.se_pix.transform(self.scaler_pix.transform(rows).astype(np.float32))
+            z = self._cca_pix(s)
+            return transform_mmd(self.mmd, z) if self.mmd is not None else z
+        raise ValueError(f"unknown view {view!r}")
+
+    # -- persistence --------------------------------------------------------
+    def save(self, model_dir: Path, method_name: str, module: str) -> None:
+        model_dir.mkdir(parents=True, exist_ok=True)
+        mmd_state = None if self.mmd is None else self.mmd.state_dict()
+        mmd = self.mmd
+        self.mmd = None
+        with (model_dir / "model.pkl").open("wb") as f:
+            pickle.dump(self, f)
+        self.mmd = mmd
+        torch.save({"mmd": mmd_state}, model_dir / "residual.pt")
+        write_encoder_spec(model_dir, method_name, module, self.config)
+
+    @classmethod
+    def load(cls, model_dir: Path) -> "SUE":
+        with (model_dir / "model.pkl").open("rb") as f:
+            model = pickle.load(f)
+        state = torch.load(model_dir / "residual.pt", map_location="cpu")["mmd"]
+        if state is not None:
+            model.mmd = MMDResidual(model.config["shared_dim"])
+            model.mmd.load_state_dict(state)
+            model.mmd.eval()
+        return model
+
+
+def write_encoder_spec(model_dir: Path, method_name: str, module: str, config: dict) -> None:
+    spec = {
+        "method": method_name,
+        "experiment": "handwritten_retrieval",
+        "command": ["python", "-m", module, "encode", "--model-dir", "{model_dir}"],
+        "config": config,
+    }
+    (model_dir / "encoder.json").write_text(json.dumps(spec, indent=2, sort_keys=True) + "\n")
+
+
+def encode_cli(args: argparse.Namespace, loader) -> None:
+    rows = np.load(args.input, allow_pickle=False)
+    model = loader(Path(args.model_dir))
+    emb = np.asarray(model.encode(args.view, rows), dtype=np.float32)
+    np.save(args.output, emb)
+
+
+def add_encode_args(sub: argparse.ArgumentParser) -> None:
+    sub.add_argument("--model-dir", required=True)
+    sub.add_argument("--view", required=True, choices=["kar", "pix"])
+    sub.add_argument("--input", required=True)
+    sub.add_argument("--output", required=True)
 
 
 def main() -> None:
+    # Use the importable module (not __main__) so pickled models load anywhere.
+    from method import sue as lib
+
+    torch.set_num_threads(1)
     parser = argparse.ArgumentParser()
-    parser.add_argument("--output-dir", default="artifacts")
-    parser.add_argument("--n-test", type=int, default=400)
-    parser.add_argument("--n-paired", type=int, default=100)
-    parser.add_argument("--se-dim", type=int, default=10)
-    parser.add_argument("--shared-dim", type=int, default=8)
-    parser.add_argument("--neighbors", type=int, default=100)
-    parser.add_argument("--mmd-epochs", type=int, default=100)
-    parser.add_argument("--batch-size", type=int, default=64)
-    parser.add_argument("--seed", type=int, default=13)
-    parser.add_argument("--device", default="cuda" if torch.cuda.is_available() else "cpu")
-    run(parser.parse_args())
+    commands = parser.add_subparsers(dest="command", required=True)
+    train = commands.add_parser("train")
+    train.add_argument("--output-dir", default="artifacts/sue")
+    train.add_argument("--se-dim", type=int, default=10)
+    train.add_argument("--neighbors", type=int, default=100)
+    train.add_argument("--mmd-epochs", type=int, default=100)
+    train.add_argument("--batch-size", type=int, default=64)
+    train.add_argument("--seed", type=int, default=13)
+    train.add_argument("--device", default="cuda" if torch.cuda.is_available() else "cpu")
+    add_encode_args(commands.add_parser("encode"))
+    args = parser.parse_args()
+
+    if args.command == "train":
+        model = lib.SUE(
+            se_dim=args.se_dim,
+            neighbors=args.neighbors,
+            mmd_epochs=args.mmd_epochs,
+            batch_size=args.batch_size,
+            seed=args.seed,
+        ).fit(lib.load_weakly_paired(), device=args.device)
+        out = Path(args.output_dir)
+        model.save(out, method_name=out.name, module="method.sue")
+        print(f"Wrote SUE encoder to {out}")
+    else:
+        lib.encode_cli(args, lib.SUE.load)
 
 
 if __name__ == "__main__":

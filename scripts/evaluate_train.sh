@@ -1,8 +1,11 @@
 #!/bin/bash
-# Visible development-slice evaluator for the handwritten retrieval gym.
+# Development evaluator for the handwritten retrieval gym.
 #
-# Mirrors scripts/evaluate.sh: pass an artifact directory containing method
-# .npz outputs, and this writes scoring/scores_train.json.
+# Scores every method directory (with encoder.json) under the artifact
+# directory on the 400 public development pairs in eval/train/data/ and writes
+# scoring/scores_train.json.  Same protocol as the hidden test.
+#
+# Usage: bash scripts/evaluate_train.sh [ARTIFACT_DIR]   (default: artifacts)
 
 set -e
 

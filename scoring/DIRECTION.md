@@ -18,3 +18,4 @@ Scientists may improve graph construction, spectral or diffusion representations
 - Training on additional pair labels or using test correspondences.
 - Solving the task as digit classification followed by label matching; the benchmark measures instance-level cross-view retrieval, not class-only matching.
 - Using a large pretrained multimodal model or external paired corpus to bypass the weakly paired setting.
+- Exploiting the evaluation protocol instead of the representation: reading evaluator data, recovering row identities from a copy of the original archive, or passing information between the two per-view encoder calls (for example to solve a test-time matching problem).

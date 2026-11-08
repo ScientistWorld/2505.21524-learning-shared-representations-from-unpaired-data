@@ -2,20 +2,19 @@
 
 ## Data
 
-Use only the UCI Multiple Features dataset loaded by `data/handwritten.py` for the `handwritten_retrieval` benchmark. Do not add external handwritten digit datasets, labels beyond the provided digit classes, or extra paired correspondences. The fixed split seed, 400-example test set, and 100-pair training budget must remain unchanged for comparable scores.
+Train only on `data/handwritten/` (via `data/handwritten.py`): 100 known pairs and 990 unpaired rows per view. Do not use the development pairs in `eval/train/data/` for training (they are for measurement and model selection), do not download or embed the original UCI archive or any other copy of these digits, and do not add labels, extra correspondences or external pretrained cross-view models.
 
-## Representation Budget
+## Representation and encoders
 
-Report retrieval from an 8-dimensional shared representation for the main score. Larger embeddings can be explored, but they must not replace the constrained result in `scoring/scores.json`.
+Submit one encoder per view through `artifacts/<name>/encoder.json` (see `briefing/evaluation.md`). Each encoder returns an 8-dimensional embedding per input row. Encoders must be functions of the trained model and the rows of the view they are given: they must not read evaluator files, write or read state shared between calls (including fixed paths such as `/tmp/...`), or otherwise use information about the other view's evaluation rows.
 
 ## Evaluation
 
-Do not train on held-out test pairs or reorder artifacts to make diagonal retrieval easier. The evaluator assumes row `i` in one artifact view corresponds to row `i` in the other only for the fixed held-out test set. Artifact files must report `paired_train_count`, `unpaired_train_count`, and `eval_pair_count`; these fields are part of the score contract, not optional metadata.
+The evaluator owns the held-out rows, their order, the correspondences, the 400-pair gallery, the 8-D operating point and the paired-only baseline. Scores are recomputed from the returned embeddings; metadata written by a method is ignored. The name `contrastive` is reserved for the frozen baseline.
 
 ## Compliance Checklist
 
-- [ ] Uses only the provided UCI Multiple Features data for `handwritten_retrieval`
-- [ ] Keeps the default split seed and 400 held-out paired test examples
-- [ ] Uses no more than 100 known training pairs for the main result
-- [ ] Reports the main result from an 8-dimensional shared embedding
-- [ ] Does not train on test pair correspondences
+- [ ] Trains only on `data/handwritten/` (100 pairs + unpaired rows), never on development or held-out pairs
+- [ ] Uses no copy of the original archive, no labels and no external paired data
+- [ ] Provides `artifacts/<name>/encoder.json` whose command returns finite `(n_rows, 8)` embeddings
+- [ ] Encodes each view independently, without reading evaluator files or sharing state across calls

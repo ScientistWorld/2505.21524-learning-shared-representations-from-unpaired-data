@@ -1,7 +1,7 @@
 {
   "experiments": {
     "handwritten_retrieval": {
-      "description": "UCI Multiple Features Handwritten cross-view retrieval using 100 paired samples and 1900 unpaired samples (Table 1).",
+      "description": "UCI Multiple Features Handwritten cross-view retrieval (Table 1): retrieve the pixel-average view from the Karhunen-Loeve view (K2P) and back (P2K) among 400 held-out pairs in an 8-dimensional shared space, with only 100 known training pairs. Results are the paper's Table 1 numbers.",
       "weight": 1.0,
       "primary_metric": "mean_r@10",
       "metrics": {
@@ -49,26 +49,6 @@
           "higher_is_better": false,
           "coefficient": -0.3,
           "description": "Average bidirectional median true-pair rank penalizes methods with poor typical ranking despite acceptable recall cutoffs."
-        },
-        "embedding_dim": {
-          "higher_is_better": false,
-          "coefficient": -0.1,
-          "description": "Latent dimensionality is a compactness constraint so recall cannot be improved solely by expanding the representation."
-        },
-        "paired_train_count": {
-          "higher_is_better": false,
-          "coefficient": -1.0,
-          "description": "Number of known cross-view training pairs used; this is the central supervision-budget constraint."
-        },
-        "unpaired_train_count": {
-          "higher_is_better": false,
-          "coefficient": 0.0,
-          "description": "Number of unpaired training examples used per view, tracked to keep the unpaired-data budget explicit without penalizing the use of unlabeled data."
-        },
-        "eval_pair_count": {
-          "higher_is_better": false,
-          "coefficient": 0.0,
-          "description": "Number of held-out paired examples scored by retrieval evaluation; tracked to make evaluation scale explicit."
         }
       },
       "results": {
@@ -80,11 +60,7 @@
           "p2k_r@1": 4.8,
           "p2k_r@5": 17.8,
           "p2k_r@10": 30.5,
-          "mean_r@10": 29.25,
-          "embedding_dim": 8.0,
-          "paired_train_count": 100.0,
-          "unpaired_train_count": 0.0,
-          "eval_pair_count": 400.0
+          "mean_r@10": 29.25
         },
         "csa": {
           "type": "baseline",
@@ -94,11 +70,7 @@
           "p2k_r@1": 3.5,
           "p2k_r@5": 9.0,
           "p2k_r@10": 15.0,
-          "mean_r@10": 16.25,
-          "embedding_dim": 8.0,
-          "paired_train_count": 100.0,
-          "unpaired_train_count": 0.0,
-          "eval_pair_count": 400.0
+          "mean_r@10": 16.25
         },
         "sue": {
           "type": "proposed",
@@ -108,12 +80,34 @@
           "p2k_r@1": 25.0,
           "p2k_r@5": 61.75,
           "p2k_r@10": 78.0,
-          "mean_r@10": 78.5,
-          "embedding_dim": 8.0,
-          "paired_train_count": 100.0,
-          "unpaired_train_count": 1900.0,
-          "eval_pair_count": 400.0
+          "mean_r@10": 78.5
         }
+      },
+      "paper_setting": {
+        "per_method": {
+          "contrastive": {
+            "embedding_dim": 8.0,
+            "paired_train_count": 100.0,
+            "unpaired_train_count": 0.0,
+            "eval_pair_count": 400.0
+          },
+          "csa": {
+            "embedding_dim": 8.0,
+            "paired_train_count": 100.0,
+            "unpaired_train_count": 0.0,
+            "eval_pair_count": 400.0
+          },
+          "sue": {
+            "embedding_dim": 8.0,
+            "paired_train_count": 100.0,
+            "unpaired_train_count": 1900.0,
+            "eval_pair_count": 400.0
+          }
+        },
+        "note": "Paper: 100 known pairs, 1900 unpaired samples (Table 12), 400 held-out test pairs, 8-dimensional CCA output."
+      },
+      "gym_setting": {
+        "note": "Scaled split of the 2000 UCI rows (stratified, fixed): 400 hidden test pairs (the paper's test size and gallery), 400 public development pairs for the train-side score, and 1200 training rows = 100 known pairs + 1100 unpaired rows thinned 10% per view (990 unpaired rows per view, Appendix E.7). The paper's Handwritten unpaired pool is larger (1900), so absolute recall is expected below the paper's. The 100-pair budget, the 8-D operating point and the 400-pair gallery are enforced by the data interface and the evaluator, not scored."
       }
     }
   }
