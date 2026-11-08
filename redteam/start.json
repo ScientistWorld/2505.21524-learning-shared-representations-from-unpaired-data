@@ -1,0 +1,11 @@
+{
+  "commit": "0d1294352912c5ab64ee0c61458621d24d2df21e",
+  "initial_dirty": [
+    "README.md (device)",
+    "manifest.json (device)",
+    "trajectory/turn_0001_raw.jsonl (deleted)",
+    "trajectory/turn_0002_raw.jsonl (deleted)",
+    "trajectory/turn_0003_raw.jsonl (deleted)",
+    "trajectory/turn_0004_raw.jsonl (deleted)"
+  ]
+}

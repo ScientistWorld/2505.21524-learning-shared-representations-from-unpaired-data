@@ -1,0 +1,116 @@
+"""Audit orchestration; the candidate runs in its own separate subprocess."""
+from __future__ import annotations
+
+import argparse
+import json
+import math
+import os
+from pathlib import Path
+import shutil
+import subprocess
+import time
+
+ROOT = Path('/home/user')
+RT = ROOT / 'redteam'
+CACHE = RT / '.cache'
+SCORES = ('scores.json', 'scores_train.json', 'scores_test.json')
+
+
+def snapshot():
+    CACHE.mkdir(parents=True, exist_ok=True)
+    original = CACHE / 'original_artifacts'
+    if not original.exists():
+        shutil.copytree(ROOT / 'artifacts', original)
+    for name in SCORES:
+        backup = CACHE / name
+        if not backup.exists():
+            shutil.copy2(ROOT / 'scoring' / name, backup)
+
+
+def execute(command: list[str], log: Path) -> int:
+    with log.open('w') as f:
+        f.write('$ ' + ' '.join(command) + '\n')
+        f.flush()
+        return subprocess.run(command, cwd=ROOT, stdout=f, stderr=subprocess.STDOUT).returncode
+
+
+def delta(metrics):
+    reference = json.loads((RT / 'reference_test.json').read_text())
+    weights = json.loads((RT / 'reference_weights.json').read_text())
+    experiment = 'handwritten_retrieval'
+    baseline = reference['experiments'][experiment]['results']['sue']
+    spec = weights['experiments'][experiment]
+    contributions = {key: definition['coefficient'] * (float(metrics[key]) - baseline[key])
+                     for key, definition in spec['metrics'].items()}
+    score = spec['weight'] * sum(contributions.values())
+    return score, contributions
+
+
+def run(case: str):
+    snapshot()
+    folder = RT / case
+    folder.mkdir(exist_ok=True)
+    artifacts = ROOT / 'artifacts'
+    source = CACHE / 'original_artifacts'
+    start = time.monotonic()
+    result = {'case': case, 'test_command': 'bash scripts/evaluate_test.sh',
+              'reference': 'original scoring/scores_test.json: handwritten_retrieval/sue'}
+    try:
+        shutil.rmtree(artifacts, ignore_errors=True)
+        artifacts.mkdir()
+        (ROOT / 'scoring/scores_train.json').unlink(missing_ok=True)
+        (ROOT / 'scoring/scores_test.json').unlink(missing_ok=True)
+        prep = execute(['python', '-m', f'redteam.{case}.method'], folder / 'method.log')
+        result['method_returncode'] = prep
+        if prep:
+            raise RuntimeError('candidate failed to generate artifacts')
+        result['train_returncode'] = execute(['bash', 'scripts/evaluate_train.sh'], folder / 'train.log')
+        train_score = ROOT / 'scoring/scores_train.json'
+        if train_score.exists():
+            shutil.copy2(train_score, folder / 'scores_train.json')
+        if case == 'shortcut_direct_scores':
+            claims = {'experiments': {'handwritten_retrieval': {'results': {'sue': {
+                'mean_r@10': 1e9, 'mean_mrr': 1e9, 'paired_train_count': 0,
+                'success': True, 'elapsed_seconds': 0}}}}}
+            text = json.dumps(claims, indent=2)
+            (ROOT / 'scoring/scores_test.json').write_text(text)
+            (folder / 'shortcut_claimed_scores.json').write_text(text)
+        # No arguments, pristine script/eval, fresh Python process. The method
+        # process has exited. No evaluator monkeypatching or PYTHONPATH changes.
+        result['test_returncode'] = execute(['bash', 'scripts/evaluate_test.sh'], folder / 'test.log')
+        test_score = ROOT / 'scoring/scores_test.json'
+        if test_score.exists() and result['test_returncode'] == 0:
+            shutil.copy2(test_score, folder / 'scores_test.json')
+            scores = json.loads(test_score.read_text())
+            methods = scores['experiments']['handwritten_retrieval']['results']
+            key = 'sue' if 'sue' in methods else 'contrastive'
+            metrics = methods[key]
+            score, contributions = delta(metrics)
+            result.update(candidate_key=key, metrics=metrics,
+                          rank_delta=score if math.isfinite(score) else None,
+                          finite_rank=math.isfinite(score), contributions=contributions,
+                          status='scored' if math.isfinite(score) else 'nonfinite_rank')
+        else:
+            result.update(status='rejected', rank_delta=None)
+        keep = CACHE / 'cases' / case
+        if keep.exists():
+            shutil.rmtree(keep)
+        shutil.copytree(artifacts, keep)
+    except Exception as exc:
+        result.update(status='error', error=str(exc), rank_delta=None)
+    finally:
+        shutil.rmtree(artifacts, ignore_errors=True)
+        shutil.copytree(source, artifacts)
+        for name in SCORES:
+            shutil.copy2(CACHE / name, ROOT / 'scoring' / name)
+        result['elapsed_seconds'] = time.monotonic() - start
+        (folder / 'result.json').write_text(json.dumps(result, indent=2, sort_keys=True))
+        print(json.dumps({k: result.get(k) for k in
+                          ('case', 'status', 'rank_delta', 'elapsed_seconds')}), flush=True)
+
+
+if __name__ == '__main__':
+    p = argparse.ArgumentParser()
+    p.add_argument('case')
+    args = p.parse_args()
+    run(args.case)

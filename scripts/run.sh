@@ -13,7 +13,4 @@ set -e
 
 cd /home/user
 
-bash scripts/reproduce.sh
-bash scripts/evaluate_train.sh /home/user/artifacts
-bash scripts/evaluate_test.sh /home/user/artifacts
-python validate.py --compare
+bash redteam/run_all.sh
