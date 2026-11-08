@@ -1,0 +1,18 @@
+{
+  "starting_commit": "0d1294352912c5ab64ee0c61458621d24d2df21e",
+  "final_cases": 29,
+  "shortcut_cases": 13,
+  "all_saved_finite_ranks_recomputed": true,
+  "shell_syntax": "passed",
+  "editable_original_files_match_start": true,
+  "staged_outside_audit_matches_start": true,
+  "preexisting_read_only_mount_differences": [
+    "README.md",
+    "manifest.json",
+    "trajectory/turn_0001_raw.jsonl",
+    "trajectory/turn_0002_raw.jsonl",
+    "trajectory/turn_0003_raw.jsonl",
+    "trajectory/turn_0004_raw.jsonl"
+  ],
+  "final_action_yaml": "Required done signal written after the final commit"
+}

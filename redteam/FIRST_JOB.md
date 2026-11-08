@@ -1,7 +1,7 @@
 # First job: fab887d0-9dc
 
 Completed successfully as a CPU job. Accessible log path in this workspace:
-`jobs/fab887d0-9dc/{stdout,stderr}.log` (the host absolute path in the completion
+`redteam/job_logs/fab887d0-9dc_{stdout,stderr}.log` (the host absolute path in the completion
 message is outside this mount).
 
 Fixed-split reference seeds 13/17/29 have score deltas +0.004761905,

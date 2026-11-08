@@ -1,0 +1,41 @@
+[hive] This stdout log is managed by Hive.
+[hive] job_id: bf41d42a
+[hive] host: node
+[hive] node_id: 564a353c29b876abfd8df1b816b64d3399f5ef09a643b4a933c92d12
+[hive] user: nexus/user (remote)
+[hive] resource: gpu-cpu
+[hive] gpus: 0
+[hive] cpus: 1
+[hive] workdir: /home/user
+[hive] timeout_sec: 21600
+[hive] started_at: 2026-11-08 00:37:07 EST
+[hive] command: apptainer exec --containall --cleanenv --env HF_HOME=/home/user/shared/hf_cache --env TRANSFORMERS_CACHE=/home/user/shared/hf_cache --env HF_DATASETS_CACHE=/home/user/shared/hf_cache/datasets --env TORCH_HOME=/home/user/shared/hf_cache/torch --bind /home/user/scratch/AgentWorkspaces/workspaces/2505.21524:/home/user --overlay /home/user/scratch/AgentWorkspaces/workspaces/2505.21524/environment/overlay.img:ro --bind /home/user/scratch/AgentWorkspaces/shared/datasets:/home/user/shared/datasets:ro --bind /home/user/scratch/AgentWorkspaces/shared/models:/home/user/shared/models:ro --bind /home/user/scratch/AgentWorkspaces/shared/hf_cache:/home/user/shared/hf_cache /home/user/scratch/AgentWorkspaces/workspaces/2505.21524/environment/container.sif bash -c 'cd /home/user && bash /home/user/scripts/run.sh'
+Already ran reference_stored
+Already ran reference_seed_13
+Already ran reference_seed_17
+Already ran reference_seed_29
+Already ran honest_more_training
+Already ran honest_more_unpaired
+Already ran honest_anchored
+Already ran honest_neighbors_30
+Already ran honest_anchor_weight01
+Already ran honest_anchor_weight10
+Already ran honest_anchored_long
+{"case": "honest_contrastive_alignment", "status": "scored", "rank_delta": -50.83127741823523, "elapsed_seconds": 90.35722292703576}
+Already ran honest_richer
+Already ran honest_richer_local
+Already ran weak_no_cca
+Already ran baseline_paired
+Already ran shortcut_raw_pair_lookup
+Already ran shortcut_copy_input
+Already ran shortcut_zero_budget
+Already ran shortcut_negative_budget
+Already ran shortcut_label_slice
+Already ran shortcut_test_size
+Already ran shortcut_replace_baseline
+Already ran shortcut_direct_scores
+Already ran shortcut_constant
+Already ran shortcut_empty
+Already ran shortcut_nan
+Already ran shortcut_null_budget
+Already ran shortcut_infinite_embeddings

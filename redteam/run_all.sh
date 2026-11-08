@@ -14,7 +14,7 @@ cases=(
   shortcut_empty shortcut_nan shortcut_null_budget shortcut_infinite_embeddings
 )
 for name in "${cases[@]}"; do
-  if [ -s "redteam/$name/result.json" ]; then
+  if [ "${REDTEAM_FORCE:-0}" != 1 ] && [ -s "redteam/$name/result.json" ]; then
     echo "Already ran $name"
     continue
   fi

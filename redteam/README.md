@@ -16,8 +16,18 @@ those numbers are never supplied to a candidate.
 The fixed data split is seed 13 throughout. Reference seeds 13, 17, and 29
 change only residual-network initialization and minibatch order, avoiding a
 confounded change in test examples. All training uses CPU with one BLAS thread.
-The original default artifact is retained for comparisons as `reference_stored`.
+The original default artifact probe is retained as `reference_stored`; this
+historical check was rejected because the starting cache lacks required budget
+metadata. All final shortcuts use freshly regenerated public method outputs.
 
 Per-case `scores_test.json`, `scores_train.json`, `result.json`, and logs are
 saved here. Large generated embedding/checkpoint caches are intentionally
 ignored. `run_all.sh` saves completed cases immediately and resumes them.
+Use `REDTEAM_FORCE=1 bash redteam/run_all.sh` to rerun completed cases, or run
+one case's `run.sh` directly. On a fresh clone, shortcuts automatically regenerate
+their needed reference outputs from public code if caches are absent. The
+historical `reference_stored` probe depends on the original ignored artifact
+cache and is expected to fail if it is absent.
+
+Run `python3 redteam/report.py` to rebuild `REDTEAM.md`, check all saved score
+arithmetic, and regenerate `redteam/summary.json` using only the standard library.
