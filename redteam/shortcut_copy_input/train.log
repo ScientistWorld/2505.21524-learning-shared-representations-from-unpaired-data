@@ -1,0 +1,15 @@
+$ bash scripts/evaluate_train.sh
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/user/eval/train/evaluate.py", line 142, in <module>
+    main()
+  File "/home/user/eval/train/evaluate.py", line 124, in main
+    experiment, method, metrics = evaluate_artifact(artifact)
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/eval/train/evaluate.py", line 103, in evaluate_artifact
+    "paired_train_count": float(require_array(data, "paired_train_count", path)),
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/eval/train/evaluate.py", line 64, in require_array
+    raise KeyError(f"{path} is missing required array {key!r}")
+KeyError: "artifacts/sue_handwritten.npz is missing required array 'paired_train_count'"

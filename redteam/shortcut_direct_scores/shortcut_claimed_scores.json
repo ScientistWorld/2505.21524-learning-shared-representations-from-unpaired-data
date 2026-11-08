@@ -1,0 +1,15 @@
+{
+  "experiments": {
+    "handwritten_retrieval": {
+      "results": {
+        "sue": {
+          "mean_r@10": 1000000000.0,
+          "mean_mrr": 1000000000.0,
+          "paired_train_count": 0,
+          "success": true,
+          "elapsed_seconds": 0
+        }
+      }
+    }
+  }
+}

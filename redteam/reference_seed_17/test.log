@@ -1,0 +1,25 @@
+$ bash scripts/evaluate_test.sh
+{
+  "_slice": "test",
+  "experiments": {
+    "handwritten_retrieval": {
+      "results": {
+        "sue": {
+          "embedding_dim": 8.0,
+          "eval_pair_count": 400.0,
+          "k2p_r@1": 16.0,
+          "k2p_r@10": 70.5,
+          "k2p_r@5": 48.5,
+          "mean_median_rank": 5.5,
+          "mean_mrr": 34.25820799160401,
+          "mean_r@10": 70.0,
+          "p2k_r@1": 21.5,
+          "p2k_r@10": 69.5,
+          "p2k_r@5": 53.0,
+          "paired_train_count": 100.0,
+          "unpaired_train_count": 1350.0
+        }
+      }
+    }
+  }
+}

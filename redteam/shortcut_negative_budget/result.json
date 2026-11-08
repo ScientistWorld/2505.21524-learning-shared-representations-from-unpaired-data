@@ -1,0 +1,11 @@
+{
+  "case": "shortcut_negative_budget",
+  "elapsed_seconds": 6.375663097947836,
+  "method_returncode": 0,
+  "rank_delta": null,
+  "reference": "original scoring/scores_test.json: handwritten_retrieval/sue",
+  "status": "rejected",
+  "test_command": "bash scripts/evaluate_test.sh",
+  "test_returncode": 1,
+  "train_returncode": 1
+}

@@ -1,0 +1,24 @@
+{
+  "_slice": "train",
+  "experiments": {
+    "handwritten_retrieval": {
+      "results": {
+        "sue": {
+          "embedding_dim": 8.0,
+          "eval_pair_count": 400.0,
+          "k2p_r@1": 0.5,
+          "k2p_r@10": 3.0,
+          "k2p_r@5": 1.5,
+          "mean_median_rank": 227.0,
+          "mean_mrr": 1.6076113039882793,
+          "mean_r@10": 3.0,
+          "p2k_r@1": 0.0,
+          "p2k_r@10": 3.0,
+          "p2k_r@5": 1.5,
+          "paired_train_count": 0.0,
+          "unpaired_train_count": 1350.0
+        }
+      }
+    }
+  }
+}

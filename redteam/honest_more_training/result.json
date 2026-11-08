@@ -1,0 +1,43 @@
+{
+  "candidate_key": "sue",
+  "case": "honest_more_training",
+  "contributions": {
+    "embedding_dim": -0.0,
+    "eval_pair_count": 0.0,
+    "k2p_r@1": -0.25,
+    "k2p_r@10": -2.0,
+    "k2p_r@5": 0.0,
+    "mean_median_rank": 0.15,
+    "mean_mrr": -0.6429602239355291,
+    "mean_r@10": -3.75,
+    "p2k_r@1": -1.5,
+    "p2k_r@10": -5.5,
+    "p2k_r@5": 1.0,
+    "paired_train_count": -0.0,
+    "unpaired_train_count": 0.0
+  },
+  "elapsed_seconds": 35.64114365307614,
+  "finite_rank": true,
+  "method_returncode": 0,
+  "metrics": {
+    "embedding_dim": 8.0,
+    "eval_pair_count": 400.0,
+    "k2p_r@1": 16.5,
+    "k2p_r@10": 68.0,
+    "k2p_r@5": 50.5,
+    "mean_median_rank": 5.0,
+    "mean_mrr": 34.29840631795543,
+    "mean_r@10": 67.25,
+    "p2k_r@1": 19.5,
+    "p2k_r@10": 66.5,
+    "p2k_r@5": 50.5,
+    "paired_train_count": 100.0,
+    "unpaired_train_count": 1350.0
+  },
+  "rank_delta": -12.492960223935528,
+  "reference": "original scoring/scores_test.json: handwritten_retrieval/sue",
+  "status": "scored",
+  "test_command": "bash scripts/evaluate_test.sh",
+  "test_returncode": 0,
+  "train_returncode": 0
+}

@@ -1,0 +1,2 @@
+$ python -m redteam.baseline_paired.method
+Wrote contrastive baseline to artifacts
