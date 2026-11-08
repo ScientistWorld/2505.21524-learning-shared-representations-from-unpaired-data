@@ -18,8 +18,12 @@ from method.sue import (
 CACHE = Path('redteam/.cache')
 
 
-def spectral(drop: float = .1, neighbors: int = 100) -> dict[str, np.ndarray]:
-    path = CACHE / f'spectral_drop_{drop}_neighbors_{neighbors}.npz'
+def spectral(drop: float = .1, neighbors: int = 100, components: int = 10) -> dict[str, np.ndarray]:
+    path = CACHE / f'spectral_drop_{drop}_neighbors_{neighbors}_dim_{components}.npz'
+    legacy = CACHE / f'spectral_drop_{drop}_neighbors_{neighbors}.npz'
+    if components == 10 and not path.exists() and legacy.exists():
+        import shutil
+        shutil.copy2(legacy, path)
     if path.exists():
         with np.load(path) as data:
             return dict(data)
@@ -28,7 +32,7 @@ def spectral(drop: float = .1, neighbors: int = 100) -> dict[str, np.ndarray]:
                         split.train_x[split.paired_indices]])
     y = np.concatenate([split.train_y[split.unpaired_y_indices],
                         split.train_y[split.paired_indices]])
-    sx, sy = NumericSpectralEmbedding(10, neighbors), NumericSpectralEmbedding(10, neighbors)
+    sx, sy = NumericSpectralEmbedding(components, neighbors), NumericSpectralEmbedding(components, neighbors)
     arrays = dict(sx=sx.fit_transform(x), sy=sy.fit_transform(y),
                   tx=sx.transform(split.test_x), ty=sy.transform(split.test_y),
                   labels=split.test_labels, unpaired=np.asarray(len(split.unpaired_x_indices)))
@@ -47,7 +51,7 @@ def save(x, y, labels, unpaired, out: Path, pairs=100):
                         eval_pair_count=np.asarray(len(labels)))
 
 
-def anchored(source, target, seed, epochs):
+def anchored(source, target, seed, epochs, anchor_weight=1., contrastive=False):
     """Real fix: preserve the known-pair CCA alignment during marginal matching."""
     torch.manual_seed(seed)
     rng = np.random.default_rng(seed)
@@ -64,7 +68,14 @@ def anchored(source, target, seed, epochs):
         for start in range(0, len(s), 64):
             si, ti = s[a[start:start+64]], t[b[start:start+64]]
             opt.zero_grad()
-            loss = mmd_loss(model(si), ti) + torch.mean((model(sp) - tp)**2)
+            loss = mmd_loss(model(si), ti) + anchor_weight * torch.mean((model(sp) - tp)**2)
+            if contrastive:
+                a = torch.nn.functional.normalize(model(sp), dim=1)
+                b = torch.nn.functional.normalize(tp, dim=1)
+                logits = a @ b.T / .07
+                targets = torch.arange(len(sp))
+                loss = loss + .5 * (torch.nn.functional.cross_entropy(logits, targets)
+                                    + torch.nn.functional.cross_entropy(logits.T, targets))
             loss.backward()
             opt.step()
     return model
@@ -78,9 +89,11 @@ def main(case: str, output: Path):
                         '--device', 'cpu', '--output-dir', str(output)], check=True)
         return
     drop = 0. if case == 'honest_more_unpaired' else .1
-    arrays = spectral(drop, 30 if case == 'honest_neighbors_30' else 100)
+    neighbors = 30 if case in ('honest_neighbors_30', 'honest_richer_local') else 100
+    components = 20 if case in ('honest_richer', 'honest_richer_local') else 10
+    arrays = spectral(drop, neighbors, components)
     seed = int(case.rsplit('_', 1)[-1]) if case.startswith('reference_seed_') else 13
-    epochs = 300 if case == 'honest_more_training' else 100
+    epochs = 300 if case in ('honest_more_training', 'honest_anchored_long') else 100
     if case == 'weak_no_cca':
         zx, zy, tx, ty = (arrays[k][:, :8] for k in ('sx', 'sy', 'tx', 'ty'))
     else:
@@ -88,15 +101,17 @@ def main(case: str, output: Path):
         cca.fit(arrays['sx'][-100:], arrays['sy'][-100:])
         zx, zy = cca.transform(arrays['sx'], arrays['sy'])
         tx, ty = cca.transform(arrays['tx'], arrays['ty'])
-    if case == 'honest_anchored':
-        model = anchored(zy, zx, seed, epochs)
+    if case.startswith('honest_anchor') or case in ('honest_contrastive_alignment', 'honest_richer', 'honest_richer_local'):
+        weight = 10. if case == 'honest_anchor_weight10' else .1 if case == 'honest_anchor_weight01' else 1.
+        model = anchored(zy, zx, seed, epochs, weight,
+                         contrastive=case == 'honest_contrastive_alignment')
     else:
         model = train_mmd_residual(zy, zx, epochs, 64, seed, 'cpu')
     save(tx, transform_mmd(model, ty), arrays['labels'], arrays['unpaired'], output,
          pairs=0 if case == 'weak_no_cca' else 100)
     (output / 'configuration.json').write_text(json.dumps(dict(
         case=case, split_seed=13, training_seed=seed, epochs=epochs,
-        drop_fraction=drop), indent=2))
+        drop_fraction=drop, neighbors=neighbors, spectral_dim=components), indent=2))
 
 
 if __name__ == '__main__':
