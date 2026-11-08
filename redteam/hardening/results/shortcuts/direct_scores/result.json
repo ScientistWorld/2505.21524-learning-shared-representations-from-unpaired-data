@@ -1,0 +1,64 @@
+{
+  "case": "direct_scores",
+  "test": {
+    "baseline_reported": {
+      "k2p_r@1": 16.5,
+      "k2p_r@10": 56.49999999999999,
+      "k2p_r@5": 39.0,
+      "mean_median_rank": 8.0,
+      "mean_mrr": 27.992451682786474,
+      "mean_r@10": 56.375,
+      "p2k_r@1": 14.499999999999998,
+      "p2k_r@10": 56.25,
+      "p2k_r@5": 42.5
+    },
+    "candidate": {
+      "k2p_r@1": 22.5,
+      "k2p_r@10": 72.0,
+      "k2p_r@5": 51.5,
+      "mean_median_rank": 5.5,
+      "mean_mrr": 35.68589372024109,
+      "mean_r@10": 70.375,
+      "p2k_r@1": 20.0,
+      "p2k_r@10": 68.75,
+      "p2k_r@5": 49.25
+    },
+    "status": {
+      "contrastive": "frozen evaluator-owned paired-only baseline",
+      "sue": "ok"
+    }
+  },
+  "test_baseline_delta_vs_reference": -64.2797536299637,
+  "test_command": "bash scripts/evaluate_test.sh",
+  "test_delta_vs_reference": 0.0,
+  "test_returncode": 0,
+  "train": {
+    "baseline_reported": {
+      "k2p_r@1": 13.5,
+      "k2p_r@10": 53.5,
+      "k2p_r@5": 39.75,
+      "mean_median_rank": 8.75,
+      "mean_mrr": 26.521232964479587,
+      "mean_r@10": 55.25,
+      "p2k_r@1": 13.0,
+      "p2k_r@10": 56.99999999999999,
+      "p2k_r@5": 39.25
+    },
+    "candidate": {
+      "k2p_r@1": 20.5,
+      "k2p_r@10": 69.0,
+      "k2p_r@5": 53.75,
+      "mean_median_rank": 5.0,
+      "mean_mrr": 34.91198355262661,
+      "mean_r@10": 67.5,
+      "p2k_r@1": 20.0,
+      "p2k_r@10": 66.0,
+      "p2k_r@5": 47.75
+    },
+    "status": {
+      "contrastive": "frozen evaluator-owned paired-only baseline",
+      "sue": "ok"
+    }
+  },
+  "train_returncode": 0
+}

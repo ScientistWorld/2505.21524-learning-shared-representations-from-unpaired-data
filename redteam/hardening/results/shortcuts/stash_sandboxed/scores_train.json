@@ -1,0 +1,35 @@
+{
+  "_slice": "train",
+  "_status": {
+    "contrastive": "frozen evaluator-owned paired-only baseline",
+    "sue": "ok"
+  },
+  "experiments": {
+    "handwritten_retrieval": {
+      "results": {
+        "contrastive": {
+          "k2p_r@1": 13.5,
+          "k2p_r@10": 53.5,
+          "k2p_r@5": 39.75,
+          "mean_median_rank": 8.75,
+          "mean_mrr": 26.521232964479587,
+          "mean_r@10": 55.25,
+          "p2k_r@1": 13.0,
+          "p2k_r@10": 56.99999999999999,
+          "p2k_r@5": 39.25
+        },
+        "sue": {
+          "k2p_r@1": 20.5,
+          "k2p_r@10": 69.0,
+          "k2p_r@5": 53.75,
+          "mean_median_rank": 5.0,
+          "mean_mrr": 34.91198355262661,
+          "mean_r@10": 67.5,
+          "p2k_r@1": 20.0,
+          "p2k_r@10": 66.0,
+          "p2k_r@5": 47.75
+        }
+      }
+    }
+  }
+}

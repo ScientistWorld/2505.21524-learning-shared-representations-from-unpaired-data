@@ -1,0 +1,131 @@
+{
+  "_slice": "train",
+  "_status": {
+    "anchored": "ok",
+    "contrastive": "frozen evaluator-owned paired-only baseline",
+    "no_cca": "ok",
+    "no_mmd": "ok",
+    "no_se": "ok",
+    "richer": "ok",
+    "richer_local": "ok",
+    "sue": "ok",
+    "sue_seed17": "ok",
+    "sue_seed29": "ok"
+  },
+  "experiments": {
+    "handwritten_retrieval": {
+      "results": {
+        "anchored": {
+          "k2p_r@1": 23.75,
+          "k2p_r@10": 75.75,
+          "k2p_r@5": 60.5,
+          "mean_median_rank": 4.5,
+          "mean_mrr": 38.93732261977172,
+          "mean_r@10": 73.375,
+          "p2k_r@1": 24.0,
+          "p2k_r@10": 71.0,
+          "p2k_r@5": 52.0
+        },
+        "contrastive": {
+          "k2p_r@1": 13.5,
+          "k2p_r@10": 53.5,
+          "k2p_r@5": 39.75,
+          "mean_median_rank": 8.75,
+          "mean_mrr": 26.521232964479587,
+          "mean_r@10": 55.25,
+          "p2k_r@1": 13.0,
+          "p2k_r@10": 56.99999999999999,
+          "p2k_r@5": 39.25
+        },
+        "no_cca": {
+          "k2p_r@1": 1.0,
+          "k2p_r@10": 4.0,
+          "k2p_r@5": 2.75,
+          "mean_median_rank": 75.5,
+          "mean_mrr": 3.572356524147392,
+          "mean_r@10": 5.375,
+          "p2k_r@1": 0.75,
+          "p2k_r@10": 6.75,
+          "p2k_r@5": 3.25
+        },
+        "no_mmd": {
+          "k2p_r@1": 18.5,
+          "k2p_r@10": 68.5,
+          "k2p_r@5": 54.25,
+          "mean_median_rank": 5.75,
+          "mean_mrr": 33.44623021393659,
+          "mean_r@10": 65.375,
+          "p2k_r@1": 18.0,
+          "p2k_r@10": 62.25000000000001,
+          "p2k_r@5": 44.5
+        },
+        "no_se": {
+          "k2p_r@1": 3.25,
+          "k2p_r@10": 26.75,
+          "k2p_r@5": 15.75,
+          "mean_median_rank": 37.75,
+          "mean_mrr": 12.113367420716779,
+          "mean_r@10": 26.75,
+          "p2k_r@1": 6.5,
+          "p2k_r@10": 26.75,
+          "p2k_r@5": 18.25
+        },
+        "richer": {
+          "k2p_r@1": 30.75,
+          "k2p_r@10": 84.0,
+          "k2p_r@5": 69.5,
+          "mean_median_rank": 3.0,
+          "mean_mrr": 46.02743164713254,
+          "mean_r@10": 82.625,
+          "p2k_r@1": 26.25,
+          "p2k_r@10": 81.25,
+          "p2k_r@5": 66.75
+        },
+        "richer_local": {
+          "k2p_r@1": 23.5,
+          "k2p_r@10": 80.0,
+          "k2p_r@5": 64.5,
+          "mean_median_rank": 4.0,
+          "mean_mrr": 39.91106779950084,
+          "mean_r@10": 76.75,
+          "p2k_r@1": 23.25,
+          "p2k_r@10": 73.5,
+          "p2k_r@5": 56.49999999999999
+        },
+        "sue": {
+          "k2p_r@1": 20.5,
+          "k2p_r@10": 69.0,
+          "k2p_r@5": 53.75,
+          "mean_median_rank": 5.0,
+          "mean_mrr": 34.91198355262661,
+          "mean_r@10": 67.5,
+          "p2k_r@1": 20.0,
+          "p2k_r@10": 66.0,
+          "p2k_r@5": 47.75
+        },
+        "sue_seed17": {
+          "k2p_r@1": 20.0,
+          "k2p_r@10": 68.5,
+          "k2p_r@5": 52.75,
+          "mean_median_rank": 5.5,
+          "mean_mrr": 34.53995727731972,
+          "mean_r@10": 67.0,
+          "p2k_r@1": 19.0,
+          "p2k_r@10": 65.5,
+          "p2k_r@5": 48.5
+        },
+        "sue_seed29": {
+          "k2p_r@1": 21.0,
+          "k2p_r@10": 70.0,
+          "k2p_r@5": 53.75,
+          "mean_median_rank": 5.5,
+          "mean_mrr": 34.70359749786502,
+          "mean_r@10": 67.375,
+          "p2k_r@1": 20.0,
+          "p2k_r@10": 64.75,
+          "p2k_r@5": 46.0
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,37 @@
+$ bash scripts/evaluate_train.sh
+[train] sue: failed: output shape (0, 8), required (400, 8) | mean_r@10=0.00
+{
+  "_slice": "train",
+  "_status": {
+    "contrastive": "frozen evaluator-owned paired-only baseline",
+    "sue": "failed: output shape (0, 8), required (400, 8)"
+  },
+  "experiments": {
+    "handwritten_retrieval": {
+      "results": {
+        "contrastive": {
+          "k2p_r@1": 13.5,
+          "k2p_r@10": 53.5,
+          "k2p_r@5": 39.75,
+          "mean_median_rank": 8.75,
+          "mean_mrr": 26.521232964479587,
+          "mean_r@10": 55.25,
+          "p2k_r@1": 13.0,
+          "p2k_r@10": 56.99999999999999,
+          "p2k_r@5": 39.25
+        },
+        "sue": {
+          "k2p_r@1": 0.0,
+          "k2p_r@10": 0.0,
+          "k2p_r@5": 0.0,
+          "mean_median_rank": 400.0,
+          "mean_mrr": 0.24999999999999997,
+          "mean_r@10": 0.0,
+          "p2k_r@1": 0.0,
+          "p2k_r@10": 0.0,
+          "p2k_r@5": 0.0
+        }
+      }
+    }
+  }
+}

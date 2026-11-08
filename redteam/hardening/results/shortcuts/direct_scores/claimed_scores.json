@@ -1,0 +1,14 @@
+{
+  "experiments": {
+    "handwritten_retrieval": {
+      "results": {
+        "sue": {
+          "mean_r@10": 1000000000.0,
+          "mean_mrr": 1000000000.0,
+          "k2p_r@1": 1000000000.0,
+          "success": true
+        }
+      }
+    }
+  }
+}
